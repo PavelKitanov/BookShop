@@ -22,13 +22,24 @@ public class Book {
 	@JoinColumn(name = "author_id")
 	private Author author;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "genre_id")
+	private Genre genre;
+	
+	private String description;
+	
+	private double price;
+	
 	public Book() {
 		
 	}
 	
-	public Book(String title, Author author) {
+	public Book(String title, Author author, Genre genre, String description, double price) {
 		this.title = title;
 		this.author = author;
+		this.genre = genre;
+		this.description = description;
+		this.price = price;
 	}
 
 	public Long getId() {
@@ -53,6 +64,30 @@ public class Book {
 
 	public void setAuthor(Author author) {
 		this.author = author;
+	}
+
+	public Genre getGenre() {
+		return genre;
+	}
+
+	public void setGenre(Genre genre) {
+		this.genre = genre;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 	
 	

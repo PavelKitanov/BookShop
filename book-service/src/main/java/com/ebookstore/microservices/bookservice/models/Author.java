@@ -31,8 +31,8 @@ public class Author {
 		this.books = new ArrayList<>();
 	}
 	
-	public Author(String name, String lastName) {
-		this.firstName = name;
+	public Author(String firstName, String lastName) {
+		this.firstName = firstName;
 		this.lastName = lastName;
 		this.books = new ArrayList<>();
 	}
@@ -51,8 +51,8 @@ public class Author {
 		return firstName;
 	}
 
-	public void setFirstName(String name) {
-		this.firstName = name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getLastName() {

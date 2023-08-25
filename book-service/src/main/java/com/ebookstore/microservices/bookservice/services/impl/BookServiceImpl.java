@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.ebookstore.microservices.bookservice.exceptions.AuthorNotFoundException;
 import com.ebookstore.microservices.bookservice.exceptions.BookNotFoundException;
+import com.ebookstore.microservices.bookservice.exceptions.GenreNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Author;
 import com.ebookstore.microservices.bookservice.models.Book;
+import com.ebookstore.microservices.bookservice.models.Genre;
 import com.ebookstore.microservices.bookservice.repositories.AuthorRepository;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
+import com.ebookstore.microservices.bookservice.repositories.GenreRepository;
 import com.ebookstore.microservices.bookservice.services.BookService;
 
 @Service
@@ -19,10 +22,12 @@ public class BookServiceImpl implements BookService {
 	
 	private final BookRepository bookRepository;
 	private final AuthorRepository authorRepository;
+	private final GenreRepository genreRepository;
 	
-	public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository) {
+	public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, GenreRepository genreRepository) {
 		this.bookRepository = bookRepository;
 		this.authorRepository = authorRepository;
+		this.genreRepository = genreRepository;
 	}
 
 	@Override
@@ -49,6 +54,46 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void deleteById(Long id) {
 		bookRepository.deleteById(id);
+	}
+
+	@Override
+	public Book update(Long id, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
+		Author author;
+		if(authorId != null)
+			author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author with id " + authorId + " is not found",HttpStatus.NOT_FOUND));
+		else {
+			author = authorRepository.findByFirstNameAndLastName(firstName, lastName);
+			if(author == null) {
+				author = new Author(firstName, lastName);
+				authorRepository.save(author);
+			}
+		}
+		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
+		Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book with id " + id + " is not found.",HttpStatus.NOT_FOUND));
+		book.setTitle(title);
+		book.setAuthor(author);
+		book.setGenre(genre);
+		book.setDescription(description);
+		book.setPrice(price);
+		return bookRepository.save(book);
+	}
+
+	@Override
+	public Book save(String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
+		Author author;
+		if(authorId != null)
+			author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author with id " + authorId + " is not found",HttpStatus.NOT_FOUND));
+		else {
+			author = authorRepository.findByFirstNameAndLastName(firstName, lastName);
+			if(author == null) {
+				author = new Author(firstName, lastName);
+				authorRepository.save(author);
+			}
+		}
+		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
+		Book book = new Book(title, author, genre, description, price);
+		author.addBook(book);
+		return bookRepository.save(book);
 	}
 
 }

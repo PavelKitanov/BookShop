@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ebookstore.microservices.bookservice.models.Author;
 import com.ebookstore.microservices.bookservice.models.Book;
-import com.ebookstore.microservices.bookservice.services.AuthorService;
 import com.ebookstore.microservices.bookservice.services.BookService;
 
 @RestController
@@ -20,11 +18,9 @@ import com.ebookstore.microservices.bookservice.services.BookService;
 public class BookController {
 
 	private final BookService bookService;
-	private final AuthorService authorService;
 	
-	public BookController(BookService bookService, AuthorService authorService) {
+	public BookController(BookService bookService) {
 		this.bookService = bookService;
-		this.authorService = authorService;
 	}
 	
 	@GetMapping
@@ -37,23 +33,26 @@ public class BookController {
 		return bookService.findById(id);
 	}
 	
-	@GetMapping("/author/{id}")
-	public List<Book> getBooksByAuthor(@PathVariable Long id){
-		return bookService.findByAuthor(id);
+	@GetMapping("/author/{authorId}")
+	public List<Book> getBooksByAuthor(@PathVariable Long authorId){
+		return bookService.findByAuthor(authorId);
 	}
 	
 	@PostMapping
-	public Book addBook(@RequestParam String title,
+	public Book addBook(@RequestParam(required = false) Long id,
+						@RequestParam String title,
+						@RequestParam(required = false) Long authorId,
 						@RequestParam String firstName,
-						@RequestParam String lastName) {
-		Author author = authorService.findByFirstNameAndLastName(firstName, lastName);
-		if(author == null) {
-			author = new Author(firstName, lastName);
+						@RequestParam String lastName,
+						@RequestParam Long genreId,
+						@RequestParam String description,
+						@RequestParam double price) {
+		if(id == null) 
+			return bookService.save(title, authorId, firstName, lastName, genreId, description, price);
+		else {
+			return bookService.update(id, title, authorId, firstName, lastName, genreId, description, price);
 		}
-		Book book = new Book(title, author);
-		author.addBook(book);
-		authorService.save(author);
-		return bookService.save(book);
+			
 	}
 	
 	@DeleteMapping("/{id}/delete")
