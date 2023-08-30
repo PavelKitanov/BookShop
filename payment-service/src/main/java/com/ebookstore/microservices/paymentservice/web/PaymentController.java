@@ -1,9 +1,15 @@
 package com.ebookstore.microservices.paymentservice.web;
 
+import com.ebookstore.microservices.paymentservice.dto.PaymentConfirmationRequest;
 import com.ebookstore.microservices.paymentservice.dto.StripeChargeDto;
 import com.ebookstore.microservices.paymentservice.dto.StripeTokenDto;
 import com.ebookstore.microservices.paymentservice.services.PaymentService;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,5 +37,26 @@ public class PaymentController {
     @ResponseBody
     public StripeChargeDto charge(@RequestBody StripeChargeDto stripeChargeDto){
         return paymentService.createCharge(stripeChargeDto);
+    }
+
+    @PostMapping("/create-payment-intent")
+    public ResponseEntity<String> createPaymentIntent() {
+        try {
+            PaymentIntent paymentIntent = paymentService.createPaymentIntent();
+            return ResponseEntity.ok(paymentIntent.toJson());
+        } catch (StripeException e) {
+            return ResponseEntity.status(500).body("Error creating payment intent.");
+        }
+    }
+
+    @PostMapping("/confirm-payment")
+    public ResponseEntity<String> confirmPayment(@RequestBody PaymentConfirmationRequest request) {
+
+        try {
+            paymentService.confirmPayment(request);
+            return ResponseEntity.ok("Payment confirmed successfully.");
+        } catch (StripeException e) {
+            return ResponseEntity.status(500).body("Error confirming payment.");
+        }
     }
 }
