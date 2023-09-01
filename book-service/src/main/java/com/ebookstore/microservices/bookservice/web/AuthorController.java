@@ -35,10 +35,10 @@ public class AuthorController {
 	
 	@PostMapping
 	public Author createAuthor(@RequestBody Author author) {
-		if(author.getId() == null)
+		if(author.getAuthorId() == null)
 			return authorService.save(author);
 		else
-			return authorService.update(author.getId(), author.getFirstName(), author.getLastName());
+			return authorService.update(author.getAuthorId(), author.getFirstName(), author.getLastName());
 	}
 	
 	@DeleteMapping("/{id}/delete")

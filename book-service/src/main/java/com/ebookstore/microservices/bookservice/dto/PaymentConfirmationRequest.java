@@ -1,4 +1,4 @@
-package com.ebookstore.microservices.paymentservice.dto;
+package com.ebookstore.microservices.bookservice.dto;
 
 import lombok.Data;
 

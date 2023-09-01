@@ -39,13 +39,14 @@ public class PaymentController {
         return paymentService.createCharge(stripeChargeDto);
     }
 
-    @PostMapping("/create-payment-intent")
-    public ResponseEntity<String> createPaymentIntent() {
+    @PostMapping("/create-payment-intent/{price}")
+    public PaymentConfirmationRequest createPaymentIntent(@PathVariable double price) {
         try {
-            PaymentIntent paymentIntent = paymentService.createPaymentIntent();
-            return ResponseEntity.ok(paymentIntent.toJson());
+            PaymentIntent paymentIntent = paymentService.createPaymentIntent(price);
+            PaymentConfirmationRequest request = new PaymentConfirmationRequest(paymentIntent.getId(), paymentIntent.getPaymentMethod());
+            return request;
         } catch (StripeException e) {
-            return ResponseEntity.status(500).body("Error creating payment intent.");
+            return null;
         }
     }
 

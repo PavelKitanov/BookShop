@@ -18,7 +18,7 @@ public class Author {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long authorId;
 	
 	private String firstName;
 	private String lastName;
@@ -39,12 +39,12 @@ public class Author {
 	
 	
 
-	public Long getId() {
-		return id;
+	public Long getAuthorId() {
+		return authorId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setAuthorId(Long id) {
+		this.authorId = id;
 	}
 
 	public String getFirstName() {

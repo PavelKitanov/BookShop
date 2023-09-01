@@ -10,7 +10,7 @@ public class Genre {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long genreId;
 	
 	private String genre;
 	
@@ -22,12 +22,12 @@ public class Genre {
 		this.genre = genre;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getGenreId() {
+		return genreId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setGenreId(Long id) {
+		this.genreId = id;
 	}
 
 	public String getGenre() {

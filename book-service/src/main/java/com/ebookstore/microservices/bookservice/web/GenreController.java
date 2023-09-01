@@ -28,9 +28,9 @@ public class GenreController {
 	
 	@PostMapping
 	public Genre addGenre(@RequestBody Genre genre) {
-		if(genre.getId() == null)
+		if(genre.getGenreId() == null)
 			return genreService.save(genre);
 		else	
-			return genreService.update(genre.getId(), genre.getGenre());
+			return genreService.update(genre.getGenreId(), genre.getGenre());
 	}
 }

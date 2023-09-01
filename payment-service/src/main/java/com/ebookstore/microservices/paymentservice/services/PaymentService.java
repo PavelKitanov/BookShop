@@ -15,7 +15,7 @@ public interface PaymentService {
     StripeChargeDto createCharge(StripeChargeDto stripeChargeDto);
     StripeTokenDto createCardToken(StripeTokenDto stripeTokenDto);
 
-    PaymentIntent createPaymentIntent() throws StripeException;
+    PaymentIntent createPaymentIntent(double price) throws StripeException;
 
     void confirmPayment(PaymentConfirmationRequest request) throws StripeException;
 

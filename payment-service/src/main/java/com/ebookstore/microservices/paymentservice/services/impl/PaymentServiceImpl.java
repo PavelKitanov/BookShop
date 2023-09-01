@@ -84,11 +84,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentIntent createPaymentIntent() throws StripeException {
+    public PaymentIntent createPaymentIntent(double price) throws StripeException {
 
         return PaymentIntent.create(new PaymentIntentCreateParams.Builder()
                     .setCurrency("usd")
-                    .setAmount(10 * 100L)  // Amount in cents (10.00 USD)
+                    .setAmount((long) (price * 100L))  // Amount in cents (10.00 USD)
                     .setPaymentMethod("pm_card_visa")
                     .build());
     }
