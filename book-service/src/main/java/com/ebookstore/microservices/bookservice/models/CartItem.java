@@ -13,6 +13,7 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartItemId;
 
+    //@ManyToOne
     @OneToOne
     private Book book;
 

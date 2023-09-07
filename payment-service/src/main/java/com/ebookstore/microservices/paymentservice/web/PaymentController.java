@@ -39,8 +39,8 @@ public class PaymentController {
         return paymentService.createCharge(stripeChargeDto);
     }
 
-    @PostMapping("/create-payment-intent/{price}")
-    public PaymentConfirmationRequest createPaymentIntent(@PathVariable double price) {
+    @PostMapping("/create-payment-intent")
+    public PaymentConfirmationRequest createPaymentIntent(@RequestParam double price) {
         try {
             PaymentIntent paymentIntent = paymentService.createPaymentIntent(price);
             PaymentConfirmationRequest request = new PaymentConfirmationRequest(paymentIntent.getId(), paymentIntent.getPaymentMethod());

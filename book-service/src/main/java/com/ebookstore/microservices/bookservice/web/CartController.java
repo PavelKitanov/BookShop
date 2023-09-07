@@ -1,16 +1,24 @@
 package com.ebookstore.microservices.bookservice.web;
 
 import com.ebookstore.microservices.bookservice.models.Cart;
+import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/carts")
 public class CartController {
 
+    @Autowired
+    private final AuthenticationProxy authenticationProxy;
+
+    @Autowired
     private final CartService cartService;
 
-    public CartController(CartService cartService) {
+    public CartController(AuthenticationProxy authenticationProxy, CartService cartService) {
+        this.authenticationProxy = authenticationProxy;
         this.cartService = cartService;
     }
 
@@ -24,8 +32,16 @@ public class CartController {
         return cartService.getCartByCustomerId(customerId);
     }
 
-    @PostMapping("/createCart/{customerId}")
-    public Cart createCart(@PathVariable Long customerId){
+    @PostMapping("/createCart")
+    public Cart createCart(@RequestHeader("Authorization") String tokenHeader){
+
+        ResponseEntity<String> response = authenticationProxy.validateToken(tokenHeader);
+
+//        if(response.getStatusCode().is2xxSuccessful()){
+//
+//        }
+        Long customerId = Long.parseLong(response.getBody());
+
         return cartService.create(new Cart(customerId));
     }
 

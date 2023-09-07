@@ -7,7 +7,6 @@ import com.ebookstore.microservices.bookservice.models.Order;
 import com.ebookstore.microservices.bookservice.proxy.PaymentProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
-import com.stripe.model.PaymentIntent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,9 @@ public class OrderController {
 
     @Autowired
     private final PaymentProxy paymentProxy;
+    @Autowired
     private final OrderService orderService;
+    @Autowired
     private final CartService cartService;
 
     public OrderController(PaymentProxy paymentProxy, OrderService orderService, CartService cartService) {
@@ -34,9 +35,9 @@ public class OrderController {
         return orderService.findAll();
     }
 
-    @GetMapping("/order/{id}")
-    public Order findById(@PathVariable Long id){
-        return orderService.findById(id);
+    @GetMapping("/order/{orderid}")
+    public Order findById(@PathVariable Long orderId){
+        return orderService.findById(orderId);
     }
 
     @GetMapping("/order/orderByCustomer/{customerId}")
@@ -56,9 +57,15 @@ public class OrderController {
         PaymentConfirmationRequest request = paymentProxy.createPaymentIntent(orderTotalPrice);
 
         if(request != null){
-            paymentProxy.confirmPayment(request);
+            ResponseEntity<String> responseEntity = paymentProxy.confirmPayment(request);
+            String response = responseEntity.getBody();
         }
 
         return orderService.create(customerId,cartId, discount);
+    }
+
+    @DeleteMapping("/delete/{orderId}")
+    public void removeOrder(@PathVariable Long orderId){
+        orderService.deleteById(orderId);
     }
 }
