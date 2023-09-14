@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.loginservice.services.impl;
 
+import com.ebookstore.microservices.loginservice.enumerations.Roles;
 import com.ebookstore.microservices.loginservice.models.Role;
 import com.ebookstore.microservices.loginservice.repositories.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -16,5 +17,10 @@ public class RoleServiceImpl implements com.ebookstore.microservices.loginservic
     @Override
     public Role saveRole(Role role) {
         return roleRepository.save(role);
+    }
+
+    @Override
+    public Role findRoleByName(Roles name) {
+        return roleRepository.findRoleByName(name);
     }
 }

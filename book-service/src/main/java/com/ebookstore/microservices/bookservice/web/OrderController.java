@@ -1,6 +1,6 @@
 package com.ebookstore.microservices.bookservice.web;
 
-import com.ebookstore.microservices.bookservice.dto.PaymentConfirmationRequest;
+import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationRequest;
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.Order;

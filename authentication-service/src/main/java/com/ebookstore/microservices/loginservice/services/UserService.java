@@ -1,22 +1,30 @@
 package com.ebookstore.microservices.loginservice.services;
 
-import com.ebookstore.microservices.loginservice.dto.UserDto;
-import com.ebookstore.microservices.loginservice.models.User;
 
+import com.ebookstore.microservices.loginservice.models.User;
+import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
+import jakarta.mail.MessagingException;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
-    User saveUser(User user);
+    User registerUser(User user, String role);
 
+    void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException;
     User findUserByEmail(String email);
 
     List<User> findAllUsers();
 
-    User loginUser(String email, String password);
+    JwtResponse loginUser(String username, String password);
 
-    boolean existsByUsername(String username);
+    Optional<User> findUserByUsername(String username);
 
-    boolean existsByEmail(String email);
+    Optional<User> findUserByFacebookId(String facebookId);
 
-    User findUserByUsername(String username);
+    boolean verify(String verificationCode);
+
+    User validateToken(String tokenHeader);
+
 }

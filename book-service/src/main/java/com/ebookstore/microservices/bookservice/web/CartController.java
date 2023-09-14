@@ -4,6 +4,7 @@ import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,16 +34,16 @@ public class CartController {
     }
 
     @PostMapping("/createCart")
-    public Cart createCart(@RequestHeader("Authorization") String tokenHeader){
+    public ResponseEntity<?> createCart(@RequestHeader("Authorization") String tokenHeader){
 
         ResponseEntity<String> response = authenticationProxy.validateToken(tokenHeader);
 
-//        if(response.getStatusCode().is2xxSuccessful()){
-//
-//        }
-        Long customerId = Long.parseLong(response.getBody());
+        if(response.getStatusCode().is2xxSuccessful()){
+            Long customerId = Long.parseLong(response.getBody());
+            return ResponseEntity.ok(cartService.create(new Cart(customerId)));
+        }
 
-        return cartService.create(new Cart(customerId));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
     }
 
     @PostMapping("/addItemToCart")

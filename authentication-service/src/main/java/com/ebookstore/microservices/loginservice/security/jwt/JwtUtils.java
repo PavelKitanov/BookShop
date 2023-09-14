@@ -19,18 +19,14 @@ import java.util.Date;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    //private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    //private final String jwtSecret = Base64.getEncoder().encodeToString(key.getEncoded());
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String jwtSecrett = Base64.getEncoder().encodeToString(key.getEncoded());
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
     @Value("${app.jwtExpirationMs}")
     private int jwtExpirationMs;
-
-    public JwtUtils(){
-        System.out.println("The JWT secret key is" + jwtSecret);
-    }
 
     public String generateJwtToken(Authentication authentication) {
 
@@ -40,6 +36,23 @@ public class JwtUtils {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String extendTokenExpiration(String token) {
+        System.out.println(jwtSecrett);
+        Claims claims = Jwts.parser()
+                .setSigningKey(key())
+                .parseClaimsJws(token)
+                .getBody();
+
+        Date now = new Date();
+        Date newExpiration = new Date(now.getTime() + 1000); // Extend by 1 second
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(newExpiration)
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
