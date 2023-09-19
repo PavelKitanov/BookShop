@@ -13,7 +13,7 @@ public interface UserService {
     User registerUser(User user, String role);
 
     void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException;
-    User findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
     List<User> findAllUsers();
 
@@ -22,6 +22,8 @@ public interface UserService {
     Optional<User> findUserByUsername(String username);
 
     Optional<User> findUserByFacebookId(String facebookId);
+
+    Optional<User> findUserByGoogleId(String googleId);
 
     boolean verify(String verificationCode);
 

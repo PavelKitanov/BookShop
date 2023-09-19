@@ -40,6 +40,8 @@ public class User {
 
     private String facebookId;
 
+    private String googleId;
+
     public User(@NonNull String username,@NonNull String email,@NonNull String password,@NonNull Role role, @NonNull String verificationCode) {
         this.username = username;
         this.email = email;
@@ -49,7 +51,7 @@ public class User {
         this.verificationCode = verificationCode;
     }
 
-    public User(@NonNull String username,@NonNull String email,@NonNull String password,@NonNull Role role, @NonNull String verificationCode, String facebookId) {
+    public User(@NonNull String username,@NonNull String email,@NonNull String password,@NonNull Role role, @NonNull String verificationCode, String facebookId, String googleId) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -57,7 +59,9 @@ public class User {
         this.enabled = true;
         this.verificationCode = verificationCode;
         this.facebookId = facebookId;
+        this.googleId = googleId;
     }
+
 
     public User(@NonNull String username,@NonNull String email,@NonNull String password) {
         this.username = username;
@@ -66,11 +70,12 @@ public class User {
         this.enabled = false;
     }
 
-    public User(@NonNull String username,@NonNull String email,@NonNull String password, String facebookId) {
+    public User(@NonNull String username,@NonNull String email,@NonNull String password, String facebookId, String googleId) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.enabled = true;
         this.facebookId = facebookId;
+        this.googleId = googleId;
     }
 }

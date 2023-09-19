@@ -1,4 +1,4 @@
-package com.ebookstore.microservices.loginservice.models.facebook;
+package com.ebookstore.microservices.loginservice.models.google;
 
 
 import lombok.AllArgsConstructor;
@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FacebookUser {
-
+public class GoogleUser {
     private String Id;
     private String name;
     private String email;

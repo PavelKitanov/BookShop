@@ -88,9 +88,12 @@ public class UserServiceImpl implements UserService {
         String password = passwordEncoder.encode(user.getPassword());
         String verificationCode = user.getVerificationCode();
         String facebookId = user.getFacebookId();
+        String googleId = user.getGoogleId();
 
         if(facebookId != null)
-            return userRepository.save(new User(username, email, password, role, verificationCode, facebookId));
+            return userRepository.save(new User(username, email, password, role, verificationCode, facebookId, null));
+        else if(googleId != null)
+            return userRepository.save(new User(username, email, password, role, verificationCode, null, googleId));
         else
             return userRepository.save(new User(username, email, password, role, verificationCode));
     }
@@ -118,7 +121,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
 
@@ -159,6 +162,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findUserByFacebookId(String facebookId) {
         return userRepository.findUserByFacebookId(facebookId);
+    }
+
+    @Override
+    public Optional<User> findUserByGoogleId(String googleId) {
+        return userRepository.findUserByGoogleId(googleId);
     }
 
     @Override

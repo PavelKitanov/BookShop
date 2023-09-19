@@ -8,6 +8,7 @@ import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
 import com.ebookstore.microservices.loginservice.payload.responses.MessageResponse;
 import com.ebookstore.microservices.loginservice.repositories.RoleRepository;
 import com.ebookstore.microservices.loginservice.services.FacebookService;
+import com.ebookstore.microservices.loginservice.services.GoogleService;
 import com.ebookstore.microservices.loginservice.services.RoleService;
 import com.ebookstore.microservices.loginservice.services.UserService;
 import jakarta.mail.MessagingException;
@@ -33,11 +34,9 @@ public class AuthController {
     @Autowired
     FacebookService facebookService;
 
+    @Autowired
+    GoogleService googleService;
 
-    public AuthController(UserService userService, RoleService roleService) {
-        this.userService = userService;
-        this.roleService = roleService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
@@ -65,8 +64,14 @@ public class AuthController {
 
     @PostMapping("/facebook/signin")
     public  ResponseEntity<?> facebookAuth(@RequestParam String facebookAccessToken) {
-        JwtResponse JwtResponse = facebookService.loginUser(facebookAccessToken);
-        return ResponseEntity.ok(JwtResponse);
+        JwtResponse jwtResponse = facebookService.loginUser(facebookAccessToken);
+        return ResponseEntity.ok(jwtResponse);
+    }
+
+    @PostMapping("/google/signin")
+    public ResponseEntity<?> googleAuth(@RequestParam String googleAccessToken){
+        JwtResponse jwtResponse = googleService.loginUser(googleAccessToken);
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @GetMapping("/validateToken")
