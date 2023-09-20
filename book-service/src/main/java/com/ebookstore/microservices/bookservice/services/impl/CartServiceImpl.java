@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
+import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
@@ -31,7 +32,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCartById(Long id) {
-        return cartRepository.findById(id).orElseThrow(null);
+        return cartRepository.findById(id).orElseThrow(() -> new CartNotFoundException("The cart with id " + id + "is not found"));
     }
 
     @Override
@@ -41,7 +42,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart create(Cart cart) {
-        return cartRepository.save(cart);
+        Cart createdCart =cartRepository.save(cart);
+        return createdCart;
     }
 
     @Override

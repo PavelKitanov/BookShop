@@ -57,7 +57,7 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book update(Long id, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
+	public Book update(Long bookId, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
 		Author author;
 		if(authorId != null)
 			author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author with id " + authorId + " is not found",HttpStatus.NOT_FOUND));
@@ -69,13 +69,14 @@ public class BookServiceImpl implements BookService {
 			}
 		}
 		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
-		Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book with id " + id + " is not found.",HttpStatus.NOT_FOUND));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " is not found.",HttpStatus.NOT_FOUND));
 		book.setTitle(title);
 		book.setAuthor(author);
 		book.setGenre(genre);
 		book.setDescription(description);
 		book.setPrice(price);
-		return bookRepository.save(book);
+		bookRepository.save(book);
+		return book;
 	}
 
 	@Override
@@ -93,7 +94,8 @@ public class BookServiceImpl implements BookService {
 		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
 		Book book = new Book(title, author, genre, description, price);
 		author.addBook(book);
-		return bookRepository.save(book);
+		bookRepository.save(book);
+		return book;
 	}
 
 }
