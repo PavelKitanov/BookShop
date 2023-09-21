@@ -3,6 +3,8 @@ package com.ebookstore.microservices.bookservice.services.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ebookstore.microservices.bookservice.services.AuthorService;
+import com.ebookstore.microservices.bookservice.services.GenreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +23,13 @@ import com.ebookstore.microservices.bookservice.services.BookService;
 public class BookServiceImpl implements BookService {
 	
 	private final BookRepository bookRepository;
-	private final AuthorRepository authorRepository;
-	private final GenreRepository genreRepository;
+	private final AuthorService authorService;
+	private final GenreService genreService;
 	
-	public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, GenreRepository genreRepository) {
+	public BookServiceImpl(BookRepository bookRepository, AuthorService authorService, GenreService genreService) {
 		this.bookRepository = bookRepository;
-		this.authorRepository = authorRepository;
-		this.genreRepository = genreRepository;
+		this.authorService = authorService;
+		this.genreService = genreService;
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class BookServiceImpl implements BookService {
 	
 	@Override
 	public List<Book> findByAuthor(Long id) {
-		Author author = authorRepository.findById(id).orElseThrow(() -> new  AuthorNotFoundException("Author with id " + id + " is not found.",HttpStatus.NOT_FOUND));
+		Author author = authorService.findById(id);
 		return bookRepository.findAll().stream().filter(b -> b.getAuthor().equals(author)).collect(Collectors.toList());
 	}
 
@@ -60,15 +62,15 @@ public class BookServiceImpl implements BookService {
 	public Book update(Long bookId, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
 		Author author;
 		if(authorId != null)
-			author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author with id " + authorId + " is not found",HttpStatus.NOT_FOUND));
+			author = authorService.findById(authorId);
 		else {
-			author = authorRepository.findByFirstNameAndLastName(firstName, lastName);
+			author = authorService.findByFirstNameAndLastName(firstName, lastName);
 			if(author == null) {
 				author = new Author(firstName, lastName);
-				authorRepository.save(author);
+				authorService.save(author);
 			}
 		}
-		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
+		Genre genre = genreService.findById(genreId);
 		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " is not found.",HttpStatus.NOT_FOUND));
 		book.setTitle(title);
 		book.setAuthor(author);
@@ -83,15 +85,15 @@ public class BookServiceImpl implements BookService {
 	public Book save(String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
 		Author author;
 		if(authorId != null)
-			author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author with id " + authorId + " is not found",HttpStatus.NOT_FOUND));
+			author = authorService.findById(authorId);
 		else {
-			author = authorRepository.findByFirstNameAndLastName(firstName, lastName);
+			author = authorService.findByFirstNameAndLastName(firstName, lastName);
 			if(author == null) {
 				author = new Author(firstName, lastName);
-				authorRepository.save(author);
+				authorService.save(author);
 			}
 		}
-		Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new GenreNotFoundException("Genre with id " + genreId + " is not found",HttpStatus.NOT_FOUND));
+		Genre genre = genreService.findById(genreId);
 		Book book = new Book(title, author, genre, description, price);
 		author.addBook(book);
 		bookRepository.save(book);

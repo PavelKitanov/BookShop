@@ -1,9 +1,11 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
 import com.ebookstore.microservices.bookservice.models.Book;
+import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
+import com.ebookstore.microservices.bookservice.services.BookService;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +15,9 @@ import java.util.List;
 public class CartItemServiceImpl implements CartItemService {
 
     private final CartItemRepository cartItemRepository;
-    private final BookRepository bookRepository;
 
-    public CartItemServiceImpl(CartItemRepository cartItemRepository, BookRepository bookRepository) {
+    public CartItemServiceImpl(CartItemRepository cartItemRepository) {
         this.cartItemRepository = cartItemRepository;
-        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -32,20 +32,14 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public CartItem save(CartItem cartItem) {
-        return cartItemRepository.save(cartItem);
-    }
-
-    @Override
-    public CartItem save(Long bookId, int quantity) {
-        Book book = bookRepository.findById(bookId).orElseThrow(null);
-        CartItem cartItem = cartItemRepository.findCartItemByBook(book);
-        if(cartItem == null)
-            return cartItemRepository.save(new CartItem(book, quantity));
-        else{
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            return cartItemRepository.save(cartItem);
+        Book book = cartItem.getBook();
+        Long customerId = cartItem.getCustomerId();
+        CartItem cartItemIsPresent = cartItemRepository.findCartItemByBookAndCustomerId(book, customerId);
+        if(cartItemIsPresent != null) {
+            cartItemIsPresent.setQuantity(cartItemIsPresent.getQuantity() + cartItem.getQuantity());
+            return cartItemRepository.save(cartItemIsPresent);
         }
-
+        return cartItemRepository.save(cartItem);
     }
 
     @Override
@@ -58,5 +52,10 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     public void deleteById(Long id) {
         cartItemRepository.deleteById(id);
+    }
+
+    @Override
+    public void delete(CartItem cartItem) {
+        cartItemRepository.delete(cartItem);
     }
 }

@@ -6,6 +6,8 @@ import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartRepository;
+import com.ebookstore.microservices.bookservice.services.BookService;
+import com.ebookstore.microservices.bookservice.services.CartItemService;
 import com.ebookstore.microservices.bookservice.services.impl.CartServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,13 +33,11 @@ import static org.mockito.Mockito.*;
 public class CartUnitTests {
 
     @Mock
-    private AuthenticationProxy authenticationProxy;
-    @Mock
     private  CartRepository cartRepository;
     @Mock
-    private  BookRepository bookRepository;
+    private BookService bookService;
     @Mock
-    private  CartItemRepository cartItemRepository;
+    private CartItemService cartItemService;
 
     @InjectMocks
     private CartServiceImpl cartService;
@@ -90,7 +90,7 @@ public class CartUnitTests {
         Long customerId = 1L;
         Cart expectedCart = new Cart(customerId);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(expectedCart);
+        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(expectedCart));
 
         Cart cartFound = cartService.getCartByCustomerId(customerId);
 
@@ -117,11 +117,11 @@ public class CartUnitTests {
 
         Cart cart = new Cart(customerId);
         Book book = new Book("Book title", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99);
-        CartItem cartItem = new CartItem(book, quantity);
+        CartItem cartItem = new CartItem(book, quantity, customerId);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(cart);
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(cartItemRepository.save(any(CartItem.class))).thenReturn(cartItem);
+        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
+        when(bookService.findById(bookId)).thenReturn(book);
+        when(cartItemService.save(any(CartItem.class))).thenReturn(cartItem);
         when(cartRepository.save(cart)).thenReturn(cart);
 
         Cart updatedCart = cartService.addItemToCart(customerId, bookId, quantity);
@@ -141,13 +141,13 @@ public class CartUnitTests {
         Cart cart = new Cart(customerId);
         Book book1 = new Book("Book1", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99);
         Book book2 = new Book("Book2", new Author("Jane","Smith"), new Genre("Non-Fiction"), "another description", 8.99);
-        CartItem cartItem1 = new CartItem(book1, quantity);
-        CartItem cartItem2 = new CartItem(book2, quantity);
+        CartItem cartItem1 = new CartItem(book1, quantity, customerId);
+        CartItem cartItem2 = new CartItem(book2, quantity, customerId);
         cart.getCartItems().add(cartItem1);
         cart.getCartItems().add(cartItem2);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(cart);
-        when(cartItemRepository.findById(item1Id)).thenReturn(Optional.of(cartItem1));
+        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
+        when(cartItemService.findById(item1Id)).thenReturn(cartItem1);
         when(cartRepository.save(cart)).thenReturn(cart);
 
         Cart updatedCart = cartService.removeItemFromCart(customerId, item1Id);

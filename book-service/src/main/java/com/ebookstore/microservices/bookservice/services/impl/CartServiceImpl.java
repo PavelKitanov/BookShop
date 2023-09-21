@@ -7,7 +7,10 @@ import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartRepository;
+import com.ebookstore.microservices.bookservice.services.BookService;
+import com.ebookstore.microservices.bookservice.services.CartItemService;
 import com.ebookstore.microservices.bookservice.services.CartService;
+import com.ebookstore.microservices.bookservice.exceptions.CartItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +19,13 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
-    private final BookRepository bookRepository;
-    private final CartItemRepository cartItemRepository;
+    private final BookService bookService;
+    private final CartItemService cartItemService;
 
-    public CartServiceImpl(CartRepository cartRepository, BookRepository bookRepository, CartItemRepository cartItemRepository) {
+    public CartServiceImpl(CartRepository cartRepository, BookService bookService, CartItemService cartItemService) {
         this.cartRepository = cartRepository;
-        this.bookRepository = bookRepository;
-        this.cartItemRepository = cartItemRepository;
+        this.bookService = bookService;
+        this.cartItemService = cartItemService;
     }
 
     @Override
@@ -36,8 +39,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart getCartByCustomerId(Long id) {
-        return cartRepository.getCartByCustomerId(id);
+    public Cart getCartByCustomerId(Long customerId) {
+        return cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
     }
 
     @Override
@@ -48,24 +51,25 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart addItemToCart(Long customerId, Long bookId, int quantity) {
-        Cart cart = cartRepository.getCartByCustomerId(customerId);
-        Book book = bookRepository.findById(bookId).orElseThrow(null);
+        Cart cart = cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
+        Book book = bookService.findById(bookId);
 
-        CartItem cartItem = new CartItem(book, quantity);
-        cartItemRepository.save(cartItem);
-        cart.addItemToCart(cartItem);
+        CartItem cartItem = cartItemService.save(new CartItem(book, quantity, customerId));
+        if(cart.getCartItems().stream().noneMatch(c -> c.getCartItemId().equals(cartItem.getCartItemId())))
+            cart.addItemToCart(cartItem);
 
+        cart.updateTotalPrice();
         return cartRepository.save(cart);
     }
 
     @Override
     public Cart removeItemFromCart(Long customerId, Long itemId) {
-        Cart cart = cartRepository.getCartByCustomerId(customerId);
-        CartItem cartItem = cartItemRepository.findById(itemId).orElse(null);
+        Cart cart = cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));;
+        CartItem cartItem = cartItemService.findById(itemId);
 
         if(cartItem != null){
             cart.removeItemFromCart(cartItem);
-            cartItemRepository.delete(cartItem);
+            cartItemService.delete(cartItem);
             cartRepository.save(cart);
         }
         return cart;

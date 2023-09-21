@@ -23,6 +23,7 @@ public class Cart {
     private Order order;
 
     @OneToMany
+    @JoinColumn(name = "cart_id")
     private List<CartItem> cartItems;
 
     private double cartTotalPrice;

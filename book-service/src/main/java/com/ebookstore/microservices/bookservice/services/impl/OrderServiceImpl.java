@@ -1,10 +1,12 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
+import com.ebookstore.microservices.bookservice.exceptions.OrderNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.Order;
 import com.ebookstore.microservices.bookservice.repositories.CartRepository;
 import com.ebookstore.microservices.bookservice.repositories.OrderRepository;
+import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +16,11 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final CartRepository cartRepository;
+    private final CartService cartService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, CartRepository cartRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CartService cartService) {
         this.orderRepository = orderRepository;
-        this.cartRepository = cartRepository;
+        this.cartService = cartService;
     }
 
 
@@ -29,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findById(Long id) {
-        return orderRepository.findById(id).orElse(null);
+        return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("Order with the id " + id + " is not found."));
     }
 
     @Override
@@ -44,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order create(Long customerId, Long cartId, Discount discount) {
-        Cart cart = cartRepository.findById(cartId).orElse(null);
+        Cart cart = cartService.getCartById(cartId);
 
         Order order = new Order(customerId, cart, discount);
         double totalPrice = cart.getCartTotalPrice();

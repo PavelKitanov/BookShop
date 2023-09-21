@@ -12,7 +12,6 @@ public interface OrderService {
     Order findByCustomerId(Long customerId);
     Order create(Order order);
     Order create(Long customerId, Long cartId, Discount discount);
-
     public double calculateDiscountOnTotalPrice(double totalPrice, Discount discount);
     void deleteById(Long id);
 

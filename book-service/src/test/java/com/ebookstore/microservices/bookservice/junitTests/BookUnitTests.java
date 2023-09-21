@@ -4,9 +4,9 @@ import com.ebookstore.microservices.bookservice.exceptions.BookNotFoundException
 import com.ebookstore.microservices.bookservice.models.Author;
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.models.Genre;
-import com.ebookstore.microservices.bookservice.repositories.AuthorRepository;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
-import com.ebookstore.microservices.bookservice.repositories.GenreRepository;
+import com.ebookstore.microservices.bookservice.services.AuthorService;
+import com.ebookstore.microservices.bookservice.services.GenreService;
 import com.ebookstore.microservices.bookservice.services.impl.BookServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,10 +34,10 @@ public class BookUnitTests {
     private BookRepository bookRepository;
 
     @Mock
-    private AuthorRepository authorRepository;
+    private AuthorService authorService ;
 
     @Mock
-    private GenreRepository genreRepository;
+    private GenreService genreService ;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -59,8 +59,8 @@ public class BookUnitTests {
         String description = "description";
         double price = 9.99;
 
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
-        when(genreRepository.findById(genreId)).thenReturn(Optional.of(genre));
+        when(authorService.findById(authorId)).thenReturn(existingAuthor);
+        when(genreService.findById(genreId)).thenReturn(genre);
 
         Book savedBook = bookService.save(title, authorId, firstName, lastName, genreId, description, price);
 
@@ -82,8 +82,8 @@ public class BookUnitTests {
         String description = "description";
         double price = 9.99;
 
-        when(authorRepository.findByFirstNameAndLastName(firstName, lastName)).thenReturn(null);
-        when(genreRepository.findById(genreId)).thenReturn(Optional.of(genre));
+        when(authorService.findByFirstNameAndLastName(firstName, lastName)).thenReturn(null);
+        when(genreService.findById(genreId)).thenReturn(genre);
 
         Book savedBook = bookService.save(title, authorId, firstName, lastName, genreId, description, price);
 
@@ -102,7 +102,7 @@ public class BookUnitTests {
         author.setAuthorId(authorId);
         Genre genre = new Genre("Drama");
 
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+        when(authorService.findById(authorId)).thenReturn(author);
 
         List<Book> allBooks = new ArrayList<>();
         allBooks.add(new Book("Book 1", author, genre, "description", 8.99));
@@ -134,8 +134,8 @@ public class BookUnitTests {
         existingBook.setBookId(bookId);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
-        when(genreRepository.findById(genreId)).thenReturn(Optional.of(genre));
+        when(authorService.findById(authorId)).thenReturn(existingAuthor);
+        when(genreService.findById(genreId)).thenReturn(genre);
         when(bookRepository.save(existingBook)).thenAnswer(invocation -> invocation.getArgument(0));
 
         Book updatedBook = bookService.update(bookId, title, authorId, null, null, genreId, description, price);
@@ -167,8 +167,8 @@ public class BookUnitTests {
         existingBook.setBookId(bookId);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-        when(authorRepository.findByFirstNameAndLastName(firstName, lastName)).thenReturn(null);
-        when(genreRepository.findById(genreId)).thenReturn(Optional.of(genre));
+        when(authorService.findByFirstNameAndLastName(firstName, lastName)).thenReturn(null);
+        when(genreService.findById(genreId)).thenReturn(genre);
         when(bookRepository.save(existingBook)).thenAnswer(invocation -> invocation.getArgument(0));
 
         Book updatedBook = bookService.update(bookId, title, null, firstName, lastName, genreId, description, price);

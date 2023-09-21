@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.proxy;
 
+import com.ebookstore.microservices.bookservice.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface AuthenticationProxy {
 
     @GetMapping("/auth/validateToken")
-    ResponseEntity<String> validateToken(@RequestHeader("Authorization") String tokenHeader);
+    ResponseEntity<UserDto> validateToken(@RequestHeader("Authorization") String tokenHeader);
 }

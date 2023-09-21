@@ -2,13 +2,9 @@ package com.ebookstore.microservices.bookservice.web;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.services.BookService;
@@ -17,9 +13,12 @@ import com.ebookstore.microservices.bookservice.services.BookService;
 @RequestMapping("/books")
 public class BookController {
 
+	@Autowired
+	private final AuthenticationProxy authenticationProxy;
 	private final BookService bookService;
 	
-	public BookController(BookService bookService) {
+	public BookController(AuthenticationProxy authenticationProxy, BookService bookService) {
+		this.authenticationProxy = authenticationProxy;
 		this.bookService = bookService;
 	}
 	
@@ -38,8 +37,9 @@ public class BookController {
 		return bookService.findByAuthor(authorId);
 	}
 	
-	@PostMapping
-	public Book addBook(@RequestParam(required = false) Long id,
+	@PostMapping("/add")
+	public Book addBook(@RequestHeader("Authorization") String tokenHeader,
+						@RequestParam(required = false) Long id,
 						@RequestParam String title,
 						@RequestParam(required = false) Long authorId,
 						@RequestParam String firstName,
@@ -47,6 +47,7 @@ public class BookController {
 						@RequestParam Long genreId,
 						@RequestParam String description,
 						@RequestParam double price) {
+		authenticationProxy.validateToken(tokenHeader);
 		if(id == null) 
 			return bookService.save(title, authorId, firstName, lastName, genreId, description, price);
 		else {
@@ -56,7 +57,9 @@ public class BookController {
 	}
 	
 	@DeleteMapping("/{id}/delete")
-	public void removeBook(@PathVariable Long id) {
+	public void removeBook(@RequestHeader("Authorization") String tokenHeader,
+						   @PathVariable Long id) {
+		authenticationProxy.validateToken(tokenHeader);
 		bookService.deleteById(id);
 	}
 	

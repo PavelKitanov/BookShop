@@ -1,6 +1,7 @@
 package com.ebookstore.microservices.loginservice.web;
 
 
+import com.ebookstore.microservices.loginservice.dto.UserDto;
 import com.ebookstore.microservices.loginservice.models.User;
 import com.ebookstore.microservices.loginservice.payload.requests.LoginRequest;
 import com.ebookstore.microservices.loginservice.payload.requests.RegisterRequest;
@@ -75,11 +76,13 @@ public class AuthController {
     }
 
     @GetMapping("/validateToken")
-    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String tokenHeader) {
 
         User user = userService.validateToken(tokenHeader);
-        if(user != null)
-            return ResponseEntity.ok(user.getUserId().toString());
+        if(user != null) {
+            UserDto userDto = new UserDto(user.getUserId(), user.getRole().getName());
+            return ResponseEntity.ok(userDto);
+        }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid");
     }

@@ -9,10 +9,9 @@ public interface CartItemService {
     List<CartItem> findAll();
     CartItem findById(Long id);
     CartItem save(CartItem cartItem);
-
-    CartItem save(Long bookId, int quantity);
-
     CartItem update(Long id, int quantity);
 
     void deleteById(Long id);
+
+    void delete(CartItem cartItem);
 }

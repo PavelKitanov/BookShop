@@ -25,7 +25,7 @@ public class Order {
 
     private double orderTotalPrice;
 
-    public Order(Long customerId, Cart cart, Discount discount){
+    public Order(Long customerId,Cart cart, Discount discount){
         this.customerId = customerId;
         this.cart = cart;
         this.discount = discount;

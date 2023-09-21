@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,14 +14,22 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartItemId;
 
-    //@ManyToOne
-    @OneToOne
+    @ManyToOne
+    @JoinColumn( name = "book_id")
     private Book book;
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    @JsonIgnore
+    private Cart cart;
 
     private int quantity;
 
-    public CartItem(Book book, int quantity){
+    private Long customerId;
+
+    public CartItem(Book book, int quantity, Long customerId){
         this.book = book;
         this.quantity = quantity;
+        this.customerId = customerId;
     }
 }
