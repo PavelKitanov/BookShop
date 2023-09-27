@@ -28,10 +28,13 @@ public class Cart {
 
     private double cartTotalPrice;
 
+    private boolean isActive;
+
     public Cart(Long customerId) {
         this.customerId = customerId;
         this.cartItems = new ArrayList<>();
         this.cartTotalPrice = 0;
+        this.isActive = true;
     }
 
     public void addItemToCart(CartItem cartItem){

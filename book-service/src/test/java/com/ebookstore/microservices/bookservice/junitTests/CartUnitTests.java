@@ -90,7 +90,7 @@ public class CartUnitTests {
         Long customerId = 1L;
         Cart expectedCart = new Cart(customerId);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(expectedCart));
+        when(cartRepository.getActiveCartByCustomerId(customerId)).thenReturn(Optional.of(expectedCart));
 
         Cart cartFound = cartService.getCartByCustomerId(customerId);
 
@@ -119,7 +119,7 @@ public class CartUnitTests {
         Book book = new Book("Book title", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99);
         CartItem cartItem = new CartItem(book, quantity, customerId);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
+        when(cartRepository.getActiveCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
         when(bookService.findById(bookId)).thenReturn(book);
         when(cartItemService.save(any(CartItem.class))).thenReturn(cartItem);
         when(cartRepository.save(cart)).thenReturn(cart);
@@ -146,7 +146,7 @@ public class CartUnitTests {
         cart.getCartItems().add(cartItem1);
         cart.getCartItems().add(cartItem2);
 
-        when(cartRepository.getCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
+        when(cartRepository.getActiveCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
         when(cartItemService.findById(item1Id)).thenReturn(cartItem1);
         when(cartRepository.save(cart)).thenReturn(cart);
 

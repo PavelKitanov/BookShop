@@ -10,8 +10,10 @@ public interface CartService {
     List<Cart> findAll();
     Cart getCartById(Long id);
     Cart getCartByCustomerId(Long id);
+    Cart save(Cart cart);
     Cart create(Cart cart);
     Cart addItemToCart(Long customerId, Long bookId, int quantity);
     Cart removeItemFromCart(Long customerId, Long itemId);
+    Cart removeAllItemsFromCart(Long customerId);
     void deleteById(Long id);
 }

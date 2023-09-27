@@ -54,7 +54,12 @@ public class OrderServiceImpl implements OrderService {
             totalPrice = calculateDiscountOnTotalPrice(totalPrice, discount);
         order.setOrderTotalPrice(totalPrice);
 
-        return orderRepository.save(order);
+        orderRepository.save(order);
+        cart.setActive(false);
+        cartService.save(cart);
+        cartService.create(new Cart(customerId));
+
+        return order;
     }
 
     @Override

@@ -4,13 +4,10 @@ import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
-import com.ebookstore.microservices.bookservice.repositories.BookRepository;
-import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartRepository;
 import com.ebookstore.microservices.bookservice.services.BookService;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
 import com.ebookstore.microservices.bookservice.services.CartService;
-import com.ebookstore.microservices.bookservice.exceptions.CartItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,23 +32,38 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCartById(Long id) {
-        return cartRepository.findById(id).orElseThrow(() -> new CartNotFoundException("The cart with id " + id + "is not found"));
+        return cartRepository.findById(id)
+                .orElseThrow(() -> new CartNotFoundException("The cart with id " + id + "is not found"));
     }
 
     @Override
     public Cart getCartByCustomerId(Long customerId) {
-        return cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
+        return cartRepository.getActiveCartByCustomerId(customerId)
+                .orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
+    }
+
+    @Override
+    public Cart save(Cart cart) {
+        return cartRepository.save(cart);
     }
 
     @Override
     public Cart create(Cart cart) {
-        Cart createdCart =cartRepository.save(cart);
+        Cart existingCart = cartRepository.getActiveCartByCustomerId(cart.getCustomerId()).orElse(null);
+
+        if(existingCart != null){
+            existingCart.setActive(false);
+            cartRepository.save(existingCart);
+        }
+
+        Cart createdCart = cartRepository.save(cart);
         return createdCart;
     }
 
     @Override
     public Cart addItemToCart(Long customerId, Long bookId, int quantity) {
-        Cart cart = cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
+        Cart cart = cartRepository.getActiveCartByCustomerId(customerId)
+                .orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
         Book book = bookService.findById(bookId);
 
         CartItem cartItem = cartItemService.save(new CartItem(book, quantity, customerId));
@@ -64,7 +76,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart removeItemFromCart(Long customerId, Long itemId) {
-        Cart cart = cartRepository.getCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));;
+        Cart cart = cartRepository.getActiveCartByCustomerId(customerId)
+                .orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
         CartItem cartItem = cartItemService.findById(itemId);
 
         if(cartItem != null){
@@ -72,6 +85,16 @@ public class CartServiceImpl implements CartService {
             cartItemService.delete(cartItem);
             cartRepository.save(cart);
         }
+        return cart;
+    }
+
+    @Override
+    public Cart removeAllItemsFromCart(Long customerId) {
+        Cart cart = cartRepository.getActiveCartByCustomerId(customerId)
+                .orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
+
+        cart.getCartItems().forEach(cartItemService::delete);
+        cartRepository.save(cart);
         return cart;
     }
 

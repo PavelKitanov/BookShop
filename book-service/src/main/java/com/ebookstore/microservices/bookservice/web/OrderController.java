@@ -1,5 +1,7 @@
 package com.ebookstore.microservices.bookservice.web;
 
+import com.ebookstore.microservices.bookservice.dto.UserDto;
+import com.ebookstore.microservices.bookservice.exceptions.NoItemsInCartException;
 import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationRequest;
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
@@ -56,14 +58,16 @@ public class OrderController {
 
     @PostMapping("/createOrder")
     public Order createOrder(@RequestHeader("Authorization") String tokenHeader,
-                             @RequestParam Long customerId,
-                             @RequestParam Long cartId,
                              @RequestParam(required = false) Discount discount
                              ){
-        authenticationProxy.validateToken(tokenHeader);
+        ResponseEntity<UserDto> authResponse = authenticationProxy.validateToken(tokenHeader);
+        UserDto userDto = authResponse.getBody();
 
-        Cart cart = cartService.getCartById(cartId);
+        Cart cart = cartService.getCartByCustomerId(userDto.getUserId());
         double orderTotalPrice = orderService.calculateDiscountOnTotalPrice(cart.getCartTotalPrice(), discount);
+
+        if(orderTotalPrice == 0)
+            throw new NoItemsInCartException("There are no items in a cart with id " + cart.getCartId());
 
         PaymentConfirmationRequest request = paymentProxy.createPaymentIntent(orderTotalPrice);
 
@@ -72,7 +76,7 @@ public class OrderController {
             String response = responseEntity.getBody();
         }
 
-        return orderService.create(customerId,cartId, discount);
+        return orderService.create(userDto.getUserId(), cart.getCartId(), discount);
     }
 
     @DeleteMapping("/delete/{orderId}")

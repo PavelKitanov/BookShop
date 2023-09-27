@@ -1,0 +1,102 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:8-oracle
+    environment:
+      MYSQL_ROOT_PASSWORD: dummypassword
+      MYSQL_DATABASE: e-book-store-database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: dummypassword
+    ports:
+      - "3306:3306"
+    networks:
+      - ebookstore-network
+     
+  mysql-login-database:
+    image: mysql:8-oracle
+    environment:
+      MYSQL_ROOT_PASSWORD: dummypassword
+      MYSQL_DATABASE: login-database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: dummypassword
+    ports:
+      - "3310:3306"
+    networks:
+      - ebookstore-network
+
+  book-service:
+    image: panikamile/ebookstre-book-service:0.0.1-SNAPSHOT
+    ports:
+      - "8000:8000"
+    networks:
+      - ebookstore-network
+    depends_on:
+      - discovery-server
+      - mysql
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING.DATASOURCE.URL: jdbc:mysql://mysql:3306/e-book-store-database
+      SPRING.DATASOURCE.USERNAME: user
+      SPRING.DATASOURCE.PASSWORD: dummypassword
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+     
+  authentication-service:
+    image: panikamile/ebookstre-authentication-service:0.0.1-SNAPSHOT
+    ports:
+      - "8200:8200"
+    networks:
+      - ebookstore-network
+    depends_on:
+      - discovery-server
+      - mysql-login-database
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING.DATASOURCE.URL: jdbc:mysql://mysql-login-database:3306/login-database
+      SPRING.DATASOURCE.USERNAME: user
+      SPRING.DATASOURCE.PASSWORD: dummypassword
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      
+  payment-service:
+    image: panikamile/ebookstre-payment-service:0.0.1-SNAPSHOT
+    ports:
+      - "8100:8100"
+    networks:
+      - ebookstore-network
+    depends_on:
+      - discovery-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      
+  api-gateway:
+    image: panikamile/ebookstre-api-gateway:0.0.1-SNAPSHOT
+    ports:
+      - "8765:8765"
+    networks:
+      - ebookstore-network
+    depends_on:
+      - discovery-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+
+      
+  discovery-server:
+    image: panikamile/ebookstre-discovery-server:0.0.1-SNAPSHOT
+    ports:
+      - "8761:8761"
+    networks:
+      - ebookstore-network
+      
+  zipkin-server:
+    image: openzipkin/zipkin:2.23
+    ports:
+      - "9411:9411"
+    networks:
+      - ebookstore-network
+    restart: always
+  
+      
+networks:
+  ebookstore-network:

@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
+import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
@@ -27,7 +28,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public CartItem findById(Long id) {
-        return cartItemRepository.findById(id).orElseThrow(null);
+        return cartItemRepository.findById(id).orElseThrow(() -> new CartNotFoundException("Cart Item with id " + id + " is not found"));
     }
 
     @Override
