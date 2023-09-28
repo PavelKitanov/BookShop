@@ -67,10 +67,14 @@ public class CartServiceImpl implements CartService {
         Book book = bookService.findById(bookId);
 
         CartItem cartItem = cartItemService.save(new CartItem(book, quantity, customerId));
-        if(cart.getCartItems().stream().noneMatch(c -> c.getCartItemId().equals(cartItem.getCartItemId())))
+        if(cart.getCartItems().stream().noneMatch(c -> c.getCartItemId().equals(cartItem.getCartItemId()))) {
             cart.addItemToCart(cartItem);
+            book.getCartItems().add(cartItem);
+        }
+
 
         cart.updateTotalPrice();
+        bookService.save(book);
         return cartRepository.save(cart);
     }
 

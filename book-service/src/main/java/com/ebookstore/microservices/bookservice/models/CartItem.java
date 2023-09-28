@@ -15,7 +15,7 @@ public class CartItem {
     private Long cartItemId;
 
     @ManyToOne
-    @JoinColumn( name = "book_id")
+    @JoinColumn(name = "book_id", nullable = true)
     private Book book;
 
     @ManyToOne

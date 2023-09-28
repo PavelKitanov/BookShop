@@ -2,8 +2,11 @@ package com.ebookstore.microservices.bookservice.web;
 
 import java.util.List;
 
+import com.ebookstore.microservices.bookservice.exceptions.AuthorNotFoundException;
 import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ebookstore.microservices.bookservice.models.Author;
@@ -23,30 +26,37 @@ public class AuthorController {
 	}
 	
 	@GetMapping
-	public List<Author> getAll(){
-		return authorService.findAll();
+	public ResponseEntity<List<Author>> getAll(){
+		return ResponseEntity.ok(authorService.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	public Author getAuthorById(@PathVariable Long id) {
-		return authorService.findById(id);
+	public ResponseEntity<?> getAuthorById(@PathVariable Long id) {
+		try {
+			Author author = authorService.findById(id);
+			return ResponseEntity.ok(author);
+		}
+		catch (AuthorNotFoundException exception){
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+		}
 	}
 	
-	@PostMapping
-	public Author createAuthor(@RequestHeader("Authorization") String tokenHeader,
+	@PostMapping("/add")
+	public ResponseEntity<Author> createAuthor(@RequestHeader("Authorization") String tokenHeader,
 							   @RequestBody Author author) {
 		authenticationProxy.validateToken(tokenHeader);
 		if(author.getAuthorId() == null)
-			return authorService.save(author);
+			return ResponseEntity.ok(authorService.save(author));
 		else
-			return authorService.update(author.getAuthorId(), author.getFirstName(), author.getLastName());
+			return ResponseEntity.ok(authorService.update(author.getAuthorId(), author.getFirstName(), author.getLastName()));
 	}
 	
 	@DeleteMapping("/{id}/delete")
-	public void removeAuthor(@RequestHeader("Authorization") String tokenHeader,
+	public ResponseEntity<Void> removeAuthor(@RequestHeader("Authorization") String tokenHeader,
 							 @PathVariable Long id) {
 		authenticationProxy.validateToken(tokenHeader);
 		authorService.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 	
 	

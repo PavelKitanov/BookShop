@@ -2,6 +2,7 @@ package com.ebookstore.microservices.bookservice.web;
 
 import com.ebookstore.microservices.bookservice.dto.UserDto;
 import com.ebookstore.microservices.bookservice.exceptions.NoItemsInCartException;
+import com.ebookstore.microservices.bookservice.exceptions.OrderNotFoundException;
 import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationRequest;
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
@@ -11,6 +12,7 @@ import com.ebookstore.microservices.bookservice.proxy.PaymentProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,27 +39,40 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<Order> findAll(@RequestHeader("Authorization") String tokenHeader){
+    public ResponseEntity<List<Order>> findAll(@RequestHeader("Authorization") String tokenHeader){
         authenticationProxy.validateToken(tokenHeader);
-        return orderService.findAll();
+        return ResponseEntity.ok(orderService.findAll());
     }
 
     @GetMapping("/order/{orderid}")
-    public Order findById(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<?> getOrderById(@RequestHeader("Authorization") String tokenHeader,
                           @PathVariable Long orderId){
         authenticationProxy.validateToken(tokenHeader);
-        return orderService.findById(orderId);
+        try {
+           Order order = orderService.findById(orderId);
+           return ResponseEntity.ok(order);
+        }
+        catch (OrderNotFoundException exception){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        }
     }
 
     @GetMapping("/order/orderByCustomer/{customerId}")
-    public Order getOrderByCustomer(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<?> getOrderByCustomer(@RequestHeader("Authorization") String tokenHeader,
                                     @PathVariable Long customerId){
         authenticationProxy.validateToken(tokenHeader);
-        return orderService.findByCustomerId(customerId);
+        try{
+            Order order = orderService.findByCustomerId(customerId);
+            return ResponseEntity.ok(order);
+        }
+        catch (OrderNotFoundException exception){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        }
+
     }
 
     @PostMapping("/createOrder")
-    public Order createOrder(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<Order> createOrder(@RequestHeader("Authorization") String tokenHeader,
                              @RequestParam(required = false) Discount discount
                              ){
         ResponseEntity<UserDto> authResponse = authenticationProxy.validateToken(tokenHeader);
@@ -76,13 +91,14 @@ public class OrderController {
             String response = responseEntity.getBody();
         }
 
-        return orderService.create(userDto.getUserId(), cart.getCartId(), discount);
+        return ResponseEntity.ok(orderService.create(userDto.getUserId(), cart.getCartId(), discount));
     }
 
     @DeleteMapping("/delete/{orderId}")
-    public void removeOrder(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<Void> removeOrder(@RequestHeader("Authorization") String tokenHeader,
                             @PathVariable Long orderId){
         authenticationProxy.validateToken(tokenHeader);
         orderService.deleteById(orderId);
+        return ResponseEntity.noContent().build();
     }
 }

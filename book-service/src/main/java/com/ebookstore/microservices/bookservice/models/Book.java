@@ -1,15 +1,13 @@
 package com.ebookstore.microservices.bookservice.models;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.List;
 
 @Entity
+@Data
 public class Book {
 	
 	@Id
@@ -18,13 +16,18 @@ public class Book {
 	
 	private String title;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "author_id")
 	private Author author;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "genre_id")
 	private Genre genre;
+
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+	@JsonIgnore
+	private List<CartItem> cartItems;
 	
 	private String description;
 	
@@ -41,54 +44,4 @@ public class Book {
 		this.description = description;
 		this.price = price;
 	}
-
-	public Long getBookId() {
-		return bookId;
-	}
-
-	public void setBookId(Long id) {
-		this.bookId = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public Author getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(Author author) {
-		this.author = author;
-	}
-
-	public Genre getGenre() {
-		return genre;
-	}
-
-	public void setGenre(Genre genre) {
-		this.genre = genre;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-	
-	
 }

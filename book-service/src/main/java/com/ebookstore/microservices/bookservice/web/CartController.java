@@ -1,6 +1,7 @@
 package com.ebookstore.microservices.bookservice.web;
 
 import com.ebookstore.microservices.bookservice.dto.UserDto;
+import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
@@ -25,54 +26,61 @@ public class CartController {
     }
 
     @GetMapping("/cart/{id}")
-    public Cart getCartById(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<Cart> getCartById(@RequestHeader("Authorization") String tokenHeader,
                             @PathVariable Long id){
 
         authenticationProxy.validateToken(tokenHeader);
-        return cartService.getCartById(id);
+        return ResponseEntity.ok(cartService.getCartById(id));
     }
 
     @GetMapping("/cartByCustomer")
-    public Cart getCartByCustomerId(@RequestHeader("Authorization") String tokenHeader){
+    public ResponseEntity<?> getCartByCustomerId(@RequestHeader("Authorization") String tokenHeader){
 
         ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
         UserDto userDto = response.getBody();
 
-        return cartService.getCartByCustomerId(userDto.getUserId());
+        try {
+            Cart cart = cartService.getCartByCustomerId(userDto.getUserId());
+            return ResponseEntity.ok(cart);
+        }
+        catch (CartNotFoundException exception){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        }
     }
 
     @PostMapping("/createCart")
     public ResponseEntity<?> createCart(@RequestHeader("Authorization") String tokenHeader){
 
-        ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
-
-        if(response.getStatusCode().is2xxSuccessful()){
+        try {
+            ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
             UserDto userDto = response.getBody();
             return ResponseEntity.ok(cartService.create(new Cart(userDto.getUserId())));
         }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
+        catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
+        }
     }
 
     @PostMapping("/addItemToCart")
-    public Cart addItemToCart(@RequestHeader("Authorization") String tokenHeader, @RequestParam Long bookId, @RequestParam int quantity){
+    public ResponseEntity<Cart> addItemToCart(@RequestHeader("Authorization") String tokenHeader, @RequestParam Long bookId, @RequestParam int quantity){
         ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
         UserDto userDto = response.getBody();
-        return cartService.addItemToCart(userDto.getUserId(), bookId, quantity);
+        return ResponseEntity.ok(cartService.addItemToCart(userDto.getUserId(), bookId, quantity));
     }
 
     @DeleteMapping("/cart/{id}")
-    public void deleteCart(@RequestHeader("Authorization") String tokenHeader, @PathVariable Long id){
+    public ResponseEntity<Void> deleteCart(@RequestHeader("Authorization") String tokenHeader, @PathVariable Long id){
         authenticationProxy.validateToken(tokenHeader);
         cartService.deleteById(id);
+        return  ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/removeItemFromCart/{cartItemId}")
-    public Cart removeItemFromCart(@RequestHeader("Authorization") String tokenHeader, @PathVariable Long cartItemId){
+    public ResponseEntity<Cart> removeItemFromCart(@RequestHeader("Authorization") String tokenHeader, @PathVariable Long cartItemId){
         ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
         UserDto userDto = response.getBody();
 
-        return cartService.removeItemFromCart(userDto.getUserId(), cartItemId);
+        return ResponseEntity.ok(cartService.removeItemFromCart(userDto.getUserId(), cartItemId));
     }
 
 }
