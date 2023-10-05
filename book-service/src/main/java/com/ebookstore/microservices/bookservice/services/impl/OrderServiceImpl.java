@@ -40,6 +40,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> findOrdersByCustomerId(Long customerId) {
+        return orderRepository.findOrdersByCustomerId(customerId);
+    }
+
+    @Override
     public Order create(Order order) {
         return orderRepository.save(order);
     }

@@ -28,6 +28,9 @@ public class Book {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
 	@JsonIgnore
 	private List<CartItem> cartItems;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+	private List<Rating> ratings;
 	
 	private String description;
 	

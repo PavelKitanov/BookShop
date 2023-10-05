@@ -10,6 +10,7 @@ public interface OrderService {
     List<Order> findAll();
     Order findById(Long id);
     Order findByCustomerId(Long customerId);
+    List<Order> findOrdersByCustomerId(Long customerId);
     Order create(Order order);
     Order create(Long customerId, Long cartId, Discount discount);
     public double calculateDiscountOnTotalPrice(double totalPrice, Discount discount);

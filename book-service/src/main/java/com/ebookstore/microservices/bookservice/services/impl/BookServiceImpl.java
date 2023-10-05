@@ -4,15 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ebookstore.microservices.bookservice.models.*;
-import com.ebookstore.microservices.bookservice.services.AuthorService;
-import com.ebookstore.microservices.bookservice.services.CartItemService;
-import com.ebookstore.microservices.bookservice.services.GenreService;
+import com.ebookstore.microservices.bookservice.services.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ebookstore.microservices.bookservice.exceptions.BookNotFoundException;
 import com.ebookstore.microservices.bookservice.repositories.BookRepository;
-import com.ebookstore.microservices.bookservice.services.BookService;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -21,12 +18,14 @@ public class BookServiceImpl implements BookService {
 	private final AuthorService authorService;
 	private final GenreService genreService;
 	private final CartItemService cartItemService;
-	
-	public BookServiceImpl(BookRepository bookRepository, AuthorService authorService, GenreService genreService, CartItemService cartItemService) {
+	private final RatingService ratingService;
+
+	public BookServiceImpl(BookRepository bookRepository, AuthorService authorService, GenreService genreService, CartItemService cartItemService, RatingService ratingService) {
 		this.bookRepository = bookRepository;
 		this.authorService = authorService;
 		this.genreService = genreService;
 		this.cartItemService = cartItemService;
+		this.ratingService = ratingService;
 	}
 
 	@Override
@@ -59,6 +58,25 @@ public class BookServiceImpl implements BookService {
 			cartItemService.save(cartItem);
 		}
 		bookRepository.deleteById(id);
+	}
+
+	@Override
+	public Book rateBook(Long bookId, int rating, Long customerId) {
+		Book book = bookRepository.findById(bookId)
+				.orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " is not found.",HttpStatus.NOT_FOUND));
+
+		Rating existingRating = ratingService.findRatingByBookAndCustomerId(book, customerId);
+
+		if(existingRating != null){
+			existingRating.setRating(rating);
+			ratingService.save(existingRating);
+		}
+		else{
+			Rating bookRating = ratingService.save(new Rating(rating, customerId, book));
+			book.getRatings().add(bookRating);
+			bookRepository.save(book);
+		}
+		return book;
 	}
 
 	@Override

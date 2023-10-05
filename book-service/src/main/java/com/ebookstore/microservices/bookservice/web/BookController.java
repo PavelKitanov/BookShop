@@ -1,9 +1,18 @@
 package com.ebookstore.microservices.bookservice.web;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.ebookstore.microservices.bookservice.dto.BookDto;
+import com.ebookstore.microservices.bookservice.dto.UserDto;
 import com.ebookstore.microservices.bookservice.exceptions.BookNotFoundException;
+import com.ebookstore.microservices.bookservice.models.CartItem;
+import com.ebookstore.microservices.bookservice.models.Order;
+import com.ebookstore.microservices.bookservice.payload.ItemBasedRecommendationRequest;
 import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
+import com.ebookstore.microservices.bookservice.proxy.RecommendationProxy;
+import com.ebookstore.microservices.bookservice.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +27,21 @@ public class BookController {
 
 	@Autowired
 	private final AuthenticationProxy authenticationProxy;
+
+	@Autowired
+	private final RecommendationProxy recommendationProxy;
+
+	@Autowired
 	private final BookService bookService;
+
+	@Autowired
+	private final OrderService orderService;
 	
-	public BookController(AuthenticationProxy authenticationProxy, BookService bookService) {
+	public BookController(AuthenticationProxy authenticationProxy, RecommendationProxy recommendationProxy, BookService bookService, OrderService orderService) {
 		this.authenticationProxy = authenticationProxy;
+		this.recommendationProxy = recommendationProxy;
 		this.bookService = bookService;
+		this.orderService = orderService;
 	}
 	
 	@GetMapping
@@ -63,6 +82,61 @@ public class BookController {
 			return ResponseEntity.ok(bookService.update(id, title, authorId, firstName, lastName, genreId, description, price));
 		}
 			
+	}
+
+	@PostMapping("/rate")
+	public ResponseEntity<Book> rateBook(@RequestHeader("Authorization") String tokenHeader,
+										 @RequestParam Long bookId,
+										 @RequestParam int rating){
+		ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
+		UserDto userDto = response.getBody();
+
+		Book book = bookService.rateBook(bookId, rating, userDto.getUserId());
+
+		return ResponseEntity.ok(book);
+	}
+
+	@GetMapping("/recommendations")
+	public ResponseEntity<List<Book>> getBookRecommendations(@RequestHeader("Authorization") String tokenHeader){
+		ResponseEntity<UserDto> authResponse = authenticationProxy.validateToken(tokenHeader);
+		UserDto userDto = authResponse.getBody();
+
+		List<Book> recommendedBooks;
+
+		List<BookDto> allBooks = new ArrayList<>();
+		for(Book book : bookService.findAll()){
+			allBooks.add(new BookDto(book.getBookId(),
+					book.getTitle(),
+					book.getAuthor().getFirstName() + " " + book.getAuthor().getLastName(),
+					book.getGenre().getGenre(),
+					book.getRatings().stream().mapToInt(rating -> rating.getRating()).boxed().collect(Collectors.toList())));
+		}
+
+		List<Order> customerOrders = orderService.findOrdersByCustomerId(userDto.getUserId());
+		if(!customerOrders.isEmpty()) {
+			Order order = customerOrders.get(customerOrders.size()-1);
+			List<CartItem> cartItems = order.getCart().getCartItems();
+			List<BookDto> customerBooks = new ArrayList<>();
+			for (CartItem item : cartItems) {
+				customerBooks.add(new BookDto(item.getBook().getBookId(),
+						item.getBook().getTitle(),
+						item.getBook().getAuthor().getFirstName() + " " + item.getBook().getAuthor().getLastName(),
+						item.getBook().getGenre().getGenre(),
+						item.getBook().getRatings().stream().mapToInt(rating -> rating.getRating()).boxed().collect(Collectors.toList())));
+			}
+
+			ResponseEntity<List<BookDto>> response = recommendationProxy.itemBasedRecommenderSystem(new ItemBasedRecommendationRequest(allBooks, customerBooks));
+			List<BookDto> recommendedBooksDto = response.getBody();
+			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).collect(Collectors.toList());
+		}
+		else {
+			ResponseEntity<List<BookDto>> response = recommendationProxy.popularityBasedRecommenderSystem(allBooks);
+			List<BookDto> recommendedBooksDto = response.getBody();
+
+			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).collect(Collectors.toList());
+		}
+
+		return ResponseEntity.ok(recommendedBooks);
 	}
 	
 	@DeleteMapping("/{id}/delete")

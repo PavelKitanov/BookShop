@@ -69,6 +69,18 @@ services:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
       
+  recommendation-service:
+    image: panikamile/ebookstre-recommendation-service:0.0.1-SNAPSHOT
+    ports:
+      - "8300:8300"
+    networks:
+      - ebookstore-network
+    depends_on:
+      - discovery-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://discovery-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      
   api-gateway:
     image: panikamile/ebookstre-api-gateway:0.0.1-SNAPSHOT
     ports:
