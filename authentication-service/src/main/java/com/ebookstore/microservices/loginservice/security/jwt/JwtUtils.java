@@ -20,7 +20,6 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final String jwtSecrett = Base64.getEncoder().encodeToString(key.getEncoded());
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
@@ -41,7 +40,6 @@ public class JwtUtils {
     }
 
     public String extendTokenExpiration(String token) {
-        System.out.println(jwtSecrett);
         Claims claims = Jwts.parser()
                 .setSigningKey(key())
                 .parseClaimsJws(token)

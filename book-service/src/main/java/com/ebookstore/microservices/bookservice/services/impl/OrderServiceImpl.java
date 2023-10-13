@@ -4,7 +4,6 @@ import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.exceptions.OrderNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.Order;
-import com.ebookstore.microservices.bookservice.repositories.CartRepository;
 import com.ebookstore.microservices.bookservice.repositories.OrderRepository;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;

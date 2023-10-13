@@ -5,7 +5,6 @@ import com.ebookstore.microservices.bookservice.exceptions.InvalidOrExpiredToken
 import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

@@ -31,6 +31,8 @@ public class GoogleServiceImpl implements GoogleService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    Random random = new Random();
+
     @Override
     public JwtResponse loginUser(String googleAccessToken) {
         GoogleUser googleUser = googleClient.getUser(googleAccessToken);
@@ -56,8 +58,7 @@ public class GoogleServiceImpl implements GoogleService {
 
     @Override
     public String generateUsername(String username) {
-        Random rnd = new Random();
-        int number = rnd.nextInt(999999);
+        int number = random.nextInt(999999);
 
         return String.format("%s.%06d", username, number);
     }
@@ -69,7 +70,6 @@ public class GoogleServiceImpl implements GoogleService {
         String specialCharacters = "!@#$";
         String numbers = "1234567890";
         String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
-        Random random = new Random();
         char[] password = new char[length];
 
         password[0] = lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length()));

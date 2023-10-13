@@ -2,7 +2,6 @@ package com.ebookstore.microservices.bookservice.web;
 
 import com.ebookstore.microservices.bookservice.dto.UserDto;
 import com.ebookstore.microservices.bookservice.exceptions.NoItemsInCartException;
-import com.ebookstore.microservices.bookservice.exceptions.OrderNotFoundException;
 import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationRequest;
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
@@ -12,7 +11,6 @@ import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
 import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,8 +76,7 @@ public class OrderController {
         PaymentConfirmationRequest request = paymentProxy.createPaymentIntent(orderTotalPrice);
 
         if(request != null){
-            ResponseEntity<String> responseEntity = paymentProxy.confirmPayment(request);
-            String response = responseEntity.getBody();
+            paymentProxy.confirmPayment(request);
         }
 
         return ResponseEntity.ok(orderService.create(userDto.getUserId(), cart.getCartId(), discount));

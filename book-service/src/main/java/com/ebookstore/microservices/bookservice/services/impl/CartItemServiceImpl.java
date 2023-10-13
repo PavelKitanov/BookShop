@@ -2,11 +2,8 @@ package com.ebookstore.microservices.bookservice.services.impl;
 
 import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Book;
-import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
-import com.ebookstore.microservices.bookservice.repositories.BookRepository;
 import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
-import com.ebookstore.microservices.bookservice.services.BookService;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
 import org.springframework.stereotype.Service;
 

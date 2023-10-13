@@ -1,7 +1,6 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.ebookstore.microservices.bookservice.models.*;
 import com.ebookstore.microservices.bookservice.services.*;
@@ -42,7 +41,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public List<Book> findByAuthor(Long id) {
 		Author author = authorService.findById(id);
-		return bookRepository.findAll().stream().filter(b -> b.getAuthor().equals(author)).collect(Collectors.toList());
+		return bookRepository.findAll().stream().filter(b -> b.getAuthor().equals(author)).toList();
 	}
 
 	@Override

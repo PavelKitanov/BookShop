@@ -7,8 +7,6 @@ import com.ebookstore.microservices.loginservice.models.User;
 import com.ebookstore.microservices.loginservice.payload.requests.LoginRequest;
 import com.ebookstore.microservices.loginservice.payload.requests.RegisterRequest;
 import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
-import com.ebookstore.microservices.loginservice.payload.responses.MessageResponse;
-import com.ebookstore.microservices.loginservice.repositories.RoleRepository;
 import com.ebookstore.microservices.loginservice.services.FacebookService;
 import com.ebookstore.microservices.loginservice.services.GoogleService;
 import com.ebookstore.microservices.loginservice.services.RoleService;
@@ -16,7 +14,6 @@ import com.ebookstore.microservices.loginservice.services.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,7 +75,6 @@ public class AuthController {
 
     @GetMapping("/validateToken")
     public ResponseEntity<UserDto> validateToken(@RequestHeader("Authorization") String tokenHeader) {
-
         User user = userService.validateToken(tokenHeader);
         if(user != null) {
             UserDto userDto = new UserDto(user.getUserId(), user.getRole().getName());
@@ -89,7 +85,11 @@ public class AuthController {
     }
 
     private String getSiteURL(HttpServletRequest request) {
-        String siteURL = request.getRequestURL().toString();
+        String siteURL = System.getenv("SITE_URL");
+
+        if(siteURL == null)
+            siteURL = request.getRequestURL().toString();
+
         return siteURL.replace(request.getServletPath(), "");
     }
 

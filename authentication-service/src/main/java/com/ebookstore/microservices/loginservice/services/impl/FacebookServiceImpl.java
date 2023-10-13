@@ -28,6 +28,8 @@ public class FacebookServiceImpl implements FacebookService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    Random random = new Random();
+
     @Override
     public JwtResponse loginUser(String fbAccessToken) {
         FacebookUser facebookUser = facebookClient.getUser(fbAccessToken);
@@ -53,8 +55,7 @@ public class FacebookServiceImpl implements FacebookService {
 
     @Override
     public String generateUsername(String username) {
-        Random rnd = new Random();
-        int number = rnd.nextInt(999999);
+        int number = random.nextInt(999999);
 
         return String.format("%s.%06d", username, number);
     }
@@ -66,7 +67,6 @@ public class FacebookServiceImpl implements FacebookService {
         String specialCharacters = "!@#$";
         String numbers = "1234567890";
         String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
-        Random random = new Random();
         char[] password = new char[length];
 
         password[0] = lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length()));

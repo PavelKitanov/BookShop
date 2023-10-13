@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class AuthorNotFoundException extends RuntimeException {
 	
-	private HttpStatus status;
+	private final HttpStatus status;
 	
 	public AuthorNotFoundException(String message, HttpStatus status) {
 		super(message);

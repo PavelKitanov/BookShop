@@ -3,8 +3,6 @@ package com.ebookstore.microservices.bookservice.services;
 import java.util.List;
 
 import com.ebookstore.microservices.bookservice.models.Book;
-import com.ebookstore.microservices.bookservice.models.Rating;
-
 
 public interface BookService {
 

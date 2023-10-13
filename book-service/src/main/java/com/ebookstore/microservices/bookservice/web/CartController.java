@@ -2,7 +2,6 @@ package com.ebookstore.microservices.bookservice.web;
 
 import com.ebookstore.microservices.bookservice.dto.UserDto;
 import com.ebookstore.microservices.bookservice.models.Cart;
-import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;

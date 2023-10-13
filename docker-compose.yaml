@@ -56,6 +56,7 @@ services:
       SPRING.DATASOURCE.USERNAME: user
       SPRING.DATASOURCE.PASSWORD: dummypassword
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SITE_URL: http://127.0.0.1:8765/authentication-service
       
   payment-service:
     image: panikamile/ebookstre-payment-service:0.0.1-SNAPSHOT

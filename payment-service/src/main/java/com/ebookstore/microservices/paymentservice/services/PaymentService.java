@@ -5,10 +5,6 @@ import com.ebookstore.microservices.paymentservice.dto.StripeChargeDto;
 import com.ebookstore.microservices.paymentservice.dto.StripeTokenDto;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.Token;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public interface PaymentService {
 

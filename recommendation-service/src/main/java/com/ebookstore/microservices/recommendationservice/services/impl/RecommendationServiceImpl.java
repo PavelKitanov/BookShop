@@ -5,7 +5,6 @@ import com.ebookstore.microservices.recommendationservice.services.Recommendatio
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.text.similarity.CosineDistance;
-import org.apache.commons.text.similarity.CosineSimilarity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,7 +17,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<BookDto> popularityBasedRecommenderSystem(List<BookDto> books) {
         List<BookDto> sortedList = books.stream()
                 .sorted(Comparator.comparingDouble(bookDto -> -calculateAverageRating(bookDto)))
-                .collect(Collectors.toList());
+                .toList();
 
         if(sortedList.size() >= 5)
             return sortedList.subList(0,5);
@@ -48,7 +47,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 recommended.remove(book);
         }
 
-        return recommended.stream().sorted(Comparator.comparing(BookDto::getSimilarityScore).reversed()).collect(Collectors.toList()).subList(0,5);
+        return recommended.stream().sorted(Comparator.comparing(BookDto::getSimilarityScore).reversed()).toList().subList(0,5);
     }
 
     private List<BookDto> itemBasedRecommenderSystemByTargetBook(Long targetBookId, int numRecommendations, List<BookDto> books) {
@@ -85,7 +84,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                     }
                     return bookDto;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return recommendedBooks;
     }

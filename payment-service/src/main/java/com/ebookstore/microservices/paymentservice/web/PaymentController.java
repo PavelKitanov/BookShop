@@ -4,16 +4,10 @@ import com.ebookstore.microservices.paymentservice.dto.PaymentConfirmationReques
 import com.ebookstore.microservices.paymentservice.dto.StripeChargeDto;
 import com.ebookstore.microservices.paymentservice.dto.StripeTokenDto;
 import com.ebookstore.microservices.paymentservice.services.PaymentService;
-import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 
 @RestController
@@ -21,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;

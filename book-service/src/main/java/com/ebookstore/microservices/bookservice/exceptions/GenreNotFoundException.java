@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class GenreNotFoundException extends RuntimeException{
 
-	private HttpStatus status;
+	private final HttpStatus status;
 	
 	public GenreNotFoundException(String message, HttpStatus status) {
 		super(message);

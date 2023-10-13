@@ -29,7 +29,7 @@ public class Book {
 	@JsonIgnore
 	private List<CartItem> cartItems;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Rating> ratings;
 	
 	private String description;

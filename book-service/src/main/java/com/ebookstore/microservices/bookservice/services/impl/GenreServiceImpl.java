@@ -41,9 +41,9 @@ public class GenreServiceImpl implements GenreService{
 
 	@Override
 	public Genre update(Long id, String genre) {
-		Genre _genre = findById(id);
-		_genre.setGenre(genre);
-		return genreRepository.save(_genre);
+		Genre existingGenre = findById(id);
+		existingGenre.setGenre(genre);
+		return genreRepository.save(existingGenre);
 	}
 
 }

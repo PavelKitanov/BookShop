@@ -2,12 +2,12 @@ package com.ebookstore.microservices.bookservice.web;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.ebookstore.microservices.bookservice.dto.BookDto;
 import com.ebookstore.microservices.bookservice.dto.UserDto;
 import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.models.Order;
+import com.ebookstore.microservices.bookservice.models.Rating;
 import com.ebookstore.microservices.bookservice.payload.ItemBasedRecommendationRequest;
 import com.ebookstore.microservices.bookservice.proxy.RecommendationProxy;
 import com.ebookstore.microservices.bookservice.services.OrderService;
@@ -102,7 +102,7 @@ public class BookController {
 					book.getTitle(),
 					book.getAuthor().getFirstName() + " " + book.getAuthor().getLastName(),
 					book.getGenre().getGenre(),
-					book.getRatings().stream().mapToInt(rating -> rating.getRating()).boxed().collect(Collectors.toList())));
+					book.getRatings().stream().mapToInt(Rating::getRating).boxed().toList()));
 		}
 
 		List<Order> customerOrders = orderService.findOrdersByCustomerId(userDto.getUserId());
@@ -115,18 +115,18 @@ public class BookController {
 						item.getBook().getTitle(),
 						item.getBook().getAuthor().getFirstName() + " " + item.getBook().getAuthor().getLastName(),
 						item.getBook().getGenre().getGenre(),
-						item.getBook().getRatings().stream().mapToInt(rating -> rating.getRating()).boxed().collect(Collectors.toList())));
+						item.getBook().getRatings().stream().mapToInt(Rating::getRating).boxed().toList()));
 			}
 
 			ResponseEntity<List<BookDto>> response = recommendationProxy.itemBasedRecommenderSystem(new ItemBasedRecommendationRequest(allBooks, customerBooks));
 			List<BookDto> recommendedBooksDto = response.getBody();
-			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).collect(Collectors.toList());
+			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).toList();
 		}
 		else {
 			ResponseEntity<List<BookDto>> response = recommendationProxy.popularityBasedRecommenderSystem(allBooks);
 			List<BookDto> recommendedBooksDto = response.getBody();
 
-			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).collect(Collectors.toList());
+			recommendedBooks = recommendedBooksDto.stream().map(bookDto -> bookService.findById(bookDto.getBookId())).toList();
 		}
 
 		return ResponseEntity.ok(recommendedBooks);
