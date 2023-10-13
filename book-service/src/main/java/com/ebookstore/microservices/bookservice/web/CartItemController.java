@@ -1,12 +1,9 @@
 package com.ebookstore.microservices.bookservice.web;
 
-import com.ebookstore.microservices.bookservice.dto.UserDto;
-import com.ebookstore.microservices.bookservice.exceptions.CartItemNotFoundException;
 import com.ebookstore.microservices.bookservice.models.CartItem;
-import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
+import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,37 +14,32 @@ import java.util.List;
 public class CartItemController {
 
     @Autowired
-    private final AuthenticationProxy authenticationProxy;
+    private final TokenService tokenService;
     private final CartItemService cartItemService;
 
-    public CartItemController(AuthenticationProxy authenticationProxy, CartItemService cartItemService) {
-        this.authenticationProxy = authenticationProxy;
+    public CartItemController(TokenService tokenService, CartItemService cartItemService) {
+        this.tokenService = tokenService;
         this.cartItemService = cartItemService;
     }
 
     @GetMapping
     public ResponseEntity<List<CartItem>> getAll(@RequestHeader("Authorization") String tokenHeader){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
         return ResponseEntity.ok(cartItemService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCartItemById(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<CartItem> getCartItemById(@RequestHeader("Authorization") String tokenHeader,
                                     @PathVariable Long id){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
 
-        try{
-            CartItem cartItem = cartItemService.findById(id);
-            return ResponseEntity.ok(cartItem);
-        }
-        catch (CartItemNotFoundException exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-        }
+        CartItem cartItem = cartItemService.findById(id);
+        return ResponseEntity.ok(cartItem);
     }
 
     @PostMapping("/updateCartItem/{cartItemId}")
     public ResponseEntity<CartItem> updateCartItem(@RequestHeader("Authorization") String tokenHeader,@PathVariable Long cartItemId, @RequestParam int quantity){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
 
         return ResponseEntity.ok(cartItemService.update(cartItemId, quantity));
     }
@@ -56,7 +48,7 @@ public class CartItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeCartItem(@RequestHeader("Authorization") String tokenHeader,
                                @PathVariable Long id){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
         cartItemService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

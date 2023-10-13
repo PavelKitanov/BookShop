@@ -36,7 +36,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findByCustomerId(Long customerId) {
-        return orderRepository.findOrderByCustomerId(customerId);
+        return orderRepository.findOrderByCustomerId(customerId)
+                .orElseThrow(() -> new OrderNotFoundException("The customer with id " + customerId + " has no order."));
     }
 
     @Override

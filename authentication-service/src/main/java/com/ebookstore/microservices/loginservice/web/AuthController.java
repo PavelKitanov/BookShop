@@ -2,6 +2,7 @@ package com.ebookstore.microservices.loginservice.web;
 
 
 import com.ebookstore.microservices.loginservice.dto.UserDto;
+import com.ebookstore.microservices.loginservice.exceptions.InvalidOrExpiredTokenException;
 import com.ebookstore.microservices.loginservice.models.User;
 import com.ebookstore.microservices.loginservice.payload.requests.LoginRequest;
 import com.ebookstore.microservices.loginservice.payload.requests.RegisterRequest;
@@ -40,13 +41,13 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
         User user = new User(registerRequest.getUsername(), registerRequest.getEmail(), registerRequest.getPassword());
         userService.registerUser(user, registerRequest.getRole().toString());
         String siteURL = getSiteURL(request);
         userService.sendVerificationEmail(user, siteURL);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully! CHeck your email to verify the account."));
+        return ResponseEntity.ok("User registered successfully! CHeck your email to verify the account.");
     }
 
     @GetMapping("/verify")
@@ -56,7 +57,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
         JwtResponse jwtResponse = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
 
@@ -64,19 +65,19 @@ public class AuthController {
     }
 
     @PostMapping("/facebook/signin")
-    public  ResponseEntity<?> facebookAuth(@RequestParam String facebookAccessToken) {
+    public  ResponseEntity<JwtResponse> facebookAuth(@RequestParam String facebookAccessToken) {
         JwtResponse jwtResponse = facebookService.loginUser(facebookAccessToken);
         return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/google/signin")
-    public ResponseEntity<?> googleAuth(@RequestParam String googleAccessToken){
+    public ResponseEntity<JwtResponse> googleAuth(@RequestParam String googleAccessToken){
         JwtResponse jwtResponse = googleService.loginUser(googleAccessToken);
         return ResponseEntity.ok(jwtResponse);
     }
 
     @GetMapping("/validateToken")
-    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+    public ResponseEntity<UserDto> validateToken(@RequestHeader("Authorization") String tokenHeader) {
 
         User user = userService.validateToken(tokenHeader);
         if(user != null) {
@@ -84,7 +85,7 @@ public class AuthController {
             return ResponseEntity.ok(userDto);
         }
         else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid");
+            throw new InvalidOrExpiredTokenException("Token is invalid or expired.");
     }
 
     private String getSiteURL(HttpServletRequest request) {

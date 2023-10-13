@@ -1,14 +1,12 @@
 package com.ebookstore.microservices.loginservice.services.impl;
 
-import com.ebookstore.microservices.loginservice.exceptions.InternalServerException;
-import com.ebookstore.microservices.loginservice.models.Role;
+import com.ebookstore.microservices.loginservice.exceptions.FacebookUserLoginException;
 import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
 import com.ebookstore.microservices.loginservice.security.services.UserDetailsImpl;
 import com.ebookstore.microservices.loginservice.client.FacebookClient;
 import com.ebookstore.microservices.loginservice.enumerations.Roles;
 import com.ebookstore.microservices.loginservice.models.User;
 import com.ebookstore.microservices.loginservice.models.facebook.FacebookUser;
-import com.ebookstore.microservices.loginservice.repositories.UserRepository;
 import com.ebookstore.microservices.loginservice.security.jwt.JwtUtils;
 import com.ebookstore.microservices.loginservice.services.FacebookService;
 import com.ebookstore.microservices.loginservice.services.UserService;
@@ -41,7 +39,7 @@ public class FacebookServiceImpl implements FacebookService {
                         userDetails, null, userDetails.getAuthorities()))
                 .map(jwtUtils::generateJwtToken)
                 .orElseThrow(() ->
-                        new InternalServerException("unable to login facebook user id " + facebookUser.getId()));
+                        new FacebookUserLoginException("unable to login facebook user id " + facebookUser.getId()));
         User user = userService.findUserByFacebookId(facebookUser.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User with this username does not exist!"));
 

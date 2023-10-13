@@ -1,6 +1,7 @@
 package com.ebookstore.microservices.bookservice.proxy;
 
 import com.ebookstore.microservices.bookservice.dto.UserDto;
+import com.ebookstore.microservices.bookservice.exceptions.InvalidOrExpiredTokenException;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

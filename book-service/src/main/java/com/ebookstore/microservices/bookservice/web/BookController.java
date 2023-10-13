@@ -6,15 +6,13 @@ import java.util.stream.Collectors;
 
 import com.ebookstore.microservices.bookservice.dto.BookDto;
 import com.ebookstore.microservices.bookservice.dto.UserDto;
-import com.ebookstore.microservices.bookservice.exceptions.BookNotFoundException;
 import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.models.Order;
 import com.ebookstore.microservices.bookservice.payload.ItemBasedRecommendationRequest;
-import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.proxy.RecommendationProxy;
 import com.ebookstore.microservices.bookservice.services.OrderService;
+import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +24,7 @@ import com.ebookstore.microservices.bookservice.services.BookService;
 public class BookController {
 
 	@Autowired
-	private final AuthenticationProxy authenticationProxy;
+	private final TokenService tokenService;
 
 	@Autowired
 	private final RecommendationProxy recommendationProxy;
@@ -37,8 +35,8 @@ public class BookController {
 	@Autowired
 	private final OrderService orderService;
 	
-	public BookController(AuthenticationProxy authenticationProxy, RecommendationProxy recommendationProxy, BookService bookService, OrderService orderService) {
-		this.authenticationProxy = authenticationProxy;
+	public BookController(TokenService tokenService, RecommendationProxy recommendationProxy, BookService bookService, OrderService orderService) {
+		this.tokenService = tokenService;
 		this.recommendationProxy = recommendationProxy;
 		this.bookService = bookService;
 		this.orderService = orderService;
@@ -50,15 +48,10 @@ public class BookController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getBookById(@PathVariable Long id) {
-		try{
-			Book book = bookService.findById(id);
-			return ResponseEntity.ok(book);
-		}
-		catch (BookNotFoundException exception){
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-		}
-	}
+	public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        Book book = bookService.findById(id);
+        return ResponseEntity.ok(book);
+    }
 	
 	@GetMapping("/author/{authorId}")
 	public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable Long authorId){
@@ -75,7 +68,7 @@ public class BookController {
 						@RequestParam Long genreId,
 						@RequestParam String description,
 						@RequestParam double price) {
-		authenticationProxy.validateToken(tokenHeader);
+		tokenService.callValidateToken(tokenHeader);
 		if(id == null) 
 			return ResponseEntity.ok(bookService.save(title, authorId, firstName, lastName, genreId, description, price));
 		else {
@@ -88,7 +81,7 @@ public class BookController {
 	public ResponseEntity<Book> rateBook(@RequestHeader("Authorization") String tokenHeader,
 										 @RequestParam Long bookId,
 										 @RequestParam int rating){
-		ResponseEntity<UserDto> response = authenticationProxy.validateToken(tokenHeader);
+		ResponseEntity<UserDto> response = tokenService.callValidateToken(tokenHeader);
 		UserDto userDto = response.getBody();
 
 		Book book = bookService.rateBook(bookId, rating, userDto.getUserId());
@@ -98,7 +91,7 @@ public class BookController {
 
 	@GetMapping("/recommendations")
 	public ResponseEntity<List<Book>> getBookRecommendations(@RequestHeader("Authorization") String tokenHeader){
-		ResponseEntity<UserDto> authResponse = authenticationProxy.validateToken(tokenHeader);
+		ResponseEntity<UserDto> authResponse = tokenService.callValidateToken(tokenHeader);
 		UserDto userDto = authResponse.getBody();
 
 		List<Book> recommendedBooks;
@@ -142,7 +135,7 @@ public class BookController {
 	@DeleteMapping("/{id}/delete")
 	public ResponseEntity<Void> removeBook(@RequestHeader("Authorization") String tokenHeader,
 						   @PathVariable Long id) {
-		authenticationProxy.validateToken(tokenHeader);
+		tokenService.callValidateToken(tokenHeader);
 		bookService.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}

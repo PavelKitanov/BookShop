@@ -2,11 +2,8 @@ package com.ebookstore.microservices.bookservice.web;
 
 import java.util.List;
 
-import com.ebookstore.microservices.bookservice.exceptions.GenreNotFoundException;
-import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
-import jakarta.ws.rs.Path;
+import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +15,11 @@ import com.ebookstore.microservices.bookservice.services.GenreService;
 public class GenreController {
 
 	@Autowired
-	private final AuthenticationProxy authenticationProxy;
+	private final TokenService tokenService;
 	private final GenreService genreService;
 
-	public GenreController(AuthenticationProxy authenticationProxy, GenreService genreService) {
-		this.authenticationProxy = authenticationProxy;
+	public GenreController(TokenService tokenService, GenreService genreService) {
+		this.tokenService = tokenService;
 		this.genreService = genreService;
 	}
 	
@@ -32,20 +29,15 @@ public class GenreController {
 	}
 
 	@GetMapping("/{genreId}")
-	public ResponseEntity<?> getGenreById(@PathVariable Long genreId){
-		try{
-			Genre genre = genreService.findById(genreId);
-			return ResponseEntity.ok(genre);
-		}
-		catch (GenreNotFoundException exception){
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-		}
+	public ResponseEntity<Genre> getGenreById(@PathVariable Long genreId){
+		Genre genre = genreService.findById(genreId);
+		return ResponseEntity.ok(genre);
 	}
 	
 	@PostMapping("/createGenre")
 	public ResponseEntity<Genre> addGenre(@RequestHeader("Authorization") String tokenHeader,
 						  @RequestBody Genre genre) {
-		authenticationProxy.validateToken(tokenHeader);
+		tokenService.callValidateToken(tokenHeader);
 		if(genre.getGenreId() == null)
 			return ResponseEntity.ok(genreService.save(genre));
 		else	
@@ -55,7 +47,7 @@ public class GenreController {
 	@DeleteMapping("/deleteGenre/{genreId}")
 	public ResponseEntity<Void> deleteGenre(@RequestHeader("Authorization") String tokenHeader,
 							@PathVariable Long genreId){
-		authenticationProxy.validateToken(tokenHeader);
+		tokenService.callValidateToken(tokenHeader);
 		genreService.deleteById(genreId);
 		return ResponseEntity.noContent().build();
 	}

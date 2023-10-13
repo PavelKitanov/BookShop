@@ -1,11 +1,9 @@
 package com.ebookstore.microservices.loginservice.services.impl;
 
-import com.ebookstore.microservices.loginservice.client.FacebookClient;
 import com.ebookstore.microservices.loginservice.client.GoogleClient;
 import com.ebookstore.microservices.loginservice.enumerations.Roles;
-import com.ebookstore.microservices.loginservice.exceptions.InternalServerException;
+import com.ebookstore.microservices.loginservice.exceptions.GoogleUserLoginException;
 import com.ebookstore.microservices.loginservice.models.User;
-import com.ebookstore.microservices.loginservice.models.facebook.FacebookUser;
 import com.ebookstore.microservices.loginservice.models.google.GoogleUser;
 import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
 import com.ebookstore.microservices.loginservice.security.jwt.JwtUtils;
@@ -44,7 +42,7 @@ public class GoogleServiceImpl implements GoogleService {
                         userDetails, null, userDetails.getAuthorities()))
                 .map(jwtUtils::generateJwtToken)
                 .orElseThrow(() ->
-                        new InternalServerException("unable to login google user id " + googleUser.getId()));
+                        new GoogleUserLoginException("unable to login google user id " + googleUser.getId()));
         User user = userService.findUserByGoogleId(googleUser.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User with this username does not exist!"));
 

@@ -7,10 +7,10 @@ import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationReque
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.Order;
-import com.ebookstore.microservices.bookservice.proxy.AuthenticationProxy;
 import com.ebookstore.microservices.bookservice.proxy.PaymentProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
+import com.ebookstore.microservices.bookservice.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import java.util.List;
 public class OrderController {
 
     @Autowired
-    private final AuthenticationProxy authenticationProxy;
+    private final TokenService tokenService;
     @Autowired
     private final PaymentProxy paymentProxy;
     @Autowired
@@ -31,8 +31,8 @@ public class OrderController {
     @Autowired
     private final CartService cartService;
 
-    public OrderController(AuthenticationProxy authenticationProxy, PaymentProxy paymentProxy, OrderService orderService, CartService cartService) {
-        this.authenticationProxy = authenticationProxy;
+    public OrderController(TokenService tokenService, PaymentProxy paymentProxy, OrderService orderService, CartService cartService) {
+        this.tokenService = tokenService;
         this.paymentProxy = paymentProxy;
         this.orderService = orderService;
         this.cartService = cartService;
@@ -40,42 +40,33 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<Order>> findAll(@RequestHeader("Authorization") String tokenHeader){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
         return ResponseEntity.ok(orderService.findAll());
     }
 
-    @GetMapping("/order/{orderid}")
-    public ResponseEntity<?> getOrderById(@RequestHeader("Authorization") String tokenHeader,
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<Order> getOrderById(@RequestHeader("Authorization") String tokenHeader,
                           @PathVariable Long orderId){
-        authenticationProxy.validateToken(tokenHeader);
-        try {
-           Order order = orderService.findById(orderId);
-           return ResponseEntity.ok(order);
-        }
-        catch (OrderNotFoundException exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-        }
+        tokenService.callValidateToken(tokenHeader);
+
+        Order order = orderService.findById(orderId);
+        return ResponseEntity.ok(order);
     }
 
     @GetMapping("/order/orderByCustomer/{customerId}")
-    public ResponseEntity<?> getOrderByCustomer(@RequestHeader("Authorization") String tokenHeader,
+    public ResponseEntity<Order> getOrderByCustomer(@RequestHeader("Authorization") String tokenHeader,
                                     @PathVariable Long customerId){
-        authenticationProxy.validateToken(tokenHeader);
-        try{
-            Order order = orderService.findByCustomerId(customerId);
-            return ResponseEntity.ok(order);
-        }
-        catch (OrderNotFoundException exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-        }
+        tokenService.callValidateToken(tokenHeader);
 
+        Order order = orderService.findByCustomerId(customerId);
+        return ResponseEntity.ok(order);
     }
 
     @PostMapping("/createOrder")
     public ResponseEntity<Order> createOrder(@RequestHeader("Authorization") String tokenHeader,
                              @RequestParam(required = false) Discount discount
                              ){
-        ResponseEntity<UserDto> authResponse = authenticationProxy.validateToken(tokenHeader);
+        ResponseEntity<UserDto> authResponse = tokenService.callValidateToken(tokenHeader);
         UserDto userDto = authResponse.getBody();
 
         Cart cart = cartService.getCartByCustomerId(userDto.getUserId());
@@ -97,7 +88,7 @@ public class OrderController {
     @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<Void> removeOrder(@RequestHeader("Authorization") String tokenHeader,
                             @PathVariable Long orderId){
-        authenticationProxy.validateToken(tokenHeader);
+        tokenService.callValidateToken(tokenHeader);
         orderService.deleteById(orderId);
         return ResponseEntity.noContent().build();
     }

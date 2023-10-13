@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Cart {
 
     private Long customerId;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "cart",fetch = FetchType.LAZY,
     cascade =  CascadeType.ALL)
     private Order order;

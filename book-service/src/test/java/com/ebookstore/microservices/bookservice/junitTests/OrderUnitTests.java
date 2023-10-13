@@ -86,7 +86,7 @@ public class OrderUnitTests {
         Long customerId = 1L;
         Order expectedOrder = new Order(customerId, new Cart(customerId), Discount.LOW);
 
-        when(orderRepository.findOrderByCustomerId(customerId)).thenReturn(expectedOrder);
+        when(orderRepository.findOrderByCustomerId(customerId)).thenReturn(Optional.of(expectedOrder));
 
         Order orderFound = orderService.findByCustomerId(customerId);
 
