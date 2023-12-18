@@ -2,6 +2,7 @@ package com.ebookstore.microservices.bookservice.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jdk.jfr.BooleanFlag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,9 +28,13 @@ public class CartItem {
 
     private Long customerId;
 
+    @BooleanFlag
+    private boolean isOrdered;
+
     public CartItem(Book book, int quantity, Long customerId){
         this.book = book;
         this.quantity = quantity;
         this.customerId = customerId;
+        this.isOrdered = false;
     }
 }

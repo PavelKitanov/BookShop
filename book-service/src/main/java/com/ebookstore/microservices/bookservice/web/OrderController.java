@@ -6,6 +6,7 @@ import com.ebookstore.microservices.bookservice.payload.PaymentConfirmationReque
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.Order;
+import com.ebookstore.microservices.bookservice.payload.StripeChargeRequest;
 import com.ebookstore.microservices.bookservice.proxy.PaymentProxy;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
@@ -14,8 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -51,19 +55,20 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
-    @GetMapping("/order/orderByCustomer/{customerId}")
-    public ResponseEntity<Order> getOrderByCustomer(@RequestHeader("Authorization") String tokenHeader,
-                                    @PathVariable Long customerId){
-        tokenService.callValidateToken(tokenHeader);
+    @GetMapping("/ordersByCustomer")
+    public ResponseEntity<List<Order>> getOrdersByCustomer(@RequestHeader("Authorization") String tokenHeader){
+        ResponseEntity<UserDto> authResponse = tokenService.callValidateToken(tokenHeader);
+        UserDto userDto = authResponse.getBody();
 
-        Order order = orderService.findByCustomerId(customerId);
-        return ResponseEntity.ok(order);
+        List<Order> orders = orderService.findOrdersByCustomerId(userDto.getUserId());
+        Collections.reverse(orders);
+        return ResponseEntity.ok(orders);
     }
 
     @PostMapping("/createOrder")
     public ResponseEntity<Order> createOrder(@RequestHeader("Authorization") String tokenHeader,
-                             @RequestParam(required = false) Discount discount
-                             ){
+                                             @RequestParam(required = false) Discount discount,
+                                             @RequestBody StripeChargeRequest stripeChargeRequest){
         ResponseEntity<UserDto> authResponse = tokenService.callValidateToken(tokenHeader);
         UserDto userDto = authResponse.getBody();
 
@@ -73,11 +78,7 @@ public class OrderController {
         if(orderTotalPrice == 0)
             throw new NoItemsInCartException("There are no items in a cart with id " + cart.getCartId());
 
-        PaymentConfirmationRequest request = paymentProxy.createPaymentIntent(orderTotalPrice);
-
-        if(request != null){
-            paymentProxy.confirmPayment(request);
-        }
+        paymentProxy.charge(stripeChargeRequest);
 
         return ResponseEntity.ok(orderService.create(userDto.getUserId(), cart.getCartId(), discount));
     }

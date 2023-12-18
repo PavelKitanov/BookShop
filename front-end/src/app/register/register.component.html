@@ -1,0 +1,42 @@
+<body>
+    <section class="container forms">
+        <div class="form signup">
+            <div class="form-content">
+                <header>Signup</header>
+                <form [formGroup]="registerForm">
+                    <div class="field input-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Username</mat-label>
+                            <input matInput type="username" formControlName="username" class="input">
+                            <mat-error *ngIf="registerForm.get('username')?.invalid">{{getUsernameErrorMessage()}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <br>
+                    <div class="field input-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Email</mat-label>
+                            <input matInput type="email" formControlName="email" class="input">
+                            <mat-error *ngIf="registerForm.get('email')?.invalid">{{getEmailErrorMessage()}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <br>
+                    <div class="field input-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Password</mat-label>
+                            <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password" class="password">
+                            <i class='bx bx-hide eye-icon' (click)="togglePasswordVisibility()"></i>
+                            <mat-error *ngIf="registerForm.get('password')?.invalid">{{getPasswordErrorMessage()}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <br>
+                    <div class="field button-field">
+                        <button type="submit" (click)="register()">Signup</button>
+                    </div>
+                </form>
+                <div class="form-link">
+                    <span>Already have an account? <a routerLink="/login" class="link login-link">Login</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>

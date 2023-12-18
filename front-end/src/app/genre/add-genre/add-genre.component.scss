@@ -1,0 +1,57 @@
+.example-container {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin: 10% auto;
+    border: 2px solid lightblue;
+    padding: 3%;
+    background-color: rgb(224, 224, 224);
+    height: 200px;
+  
+    @media (max-width: 990px) {
+      width: 70%;
+      }
+    
+    @media (max-width: 400px) {
+    width: 90%;
+    }
+  }
+  
+  .example-container p {
+    margin-bottom: 0px;  
+  }
+  
+  .mat-form-field {
+    width: 100%;
+    margin-bottom: 0px;  
+  }
+  
+  .example-container p > * {
+    width: 100%;
+  }
+  
+  mat-card-title{
+    margin: auto;
+    margin-bottom: 5%;
+    font-size: x-large;
+    font-weight: bold;
+  }
+  
+  .buttons button {
+  width: 30%;
+  padding-left: 0px;
+  
+  }
+  
+  .buttons a {
+  width: 30%;
+  padding-left: 0px;
+  }
+  
+  .buttons{
+  text-align: center;
+  }
+
+
+  
+  

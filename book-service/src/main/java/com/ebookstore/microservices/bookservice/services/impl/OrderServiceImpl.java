@@ -3,8 +3,10 @@ package com.ebookstore.microservices.bookservice.services.impl;
 import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.exceptions.OrderNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Cart;
+import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.models.Order;
 import com.ebookstore.microservices.bookservice.repositories.OrderRepository;
+import com.ebookstore.microservices.bookservice.services.CartItemService;
 import com.ebookstore.microservices.bookservice.services.CartService;
 import com.ebookstore.microservices.bookservice.services.OrderService;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CartService cartService;
+    private final CartItemService cartItemService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, CartService cartService) {
+    public OrderServiceImpl(OrderRepository orderRepository, CartService cartService, CartItemService cartItemService) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
+        this.cartItemService = cartItemService;
     }
 
 
@@ -62,6 +66,10 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         cart.setActive(false);
         cartService.save(cart);
+        for(CartItem cartItem : cart.getCartItems()){
+            cartItem.setOrdered(true);
+            cartItemService.update(cartItem);
+        }
         cartService.create(new Cart(customerId));
 
         return order;

@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.ebookstore.microservices.bookservice.models.*;
 import com.ebookstore.microservices.bookservice.services.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,6 @@ public class BookServiceImpl implements BookService {
 		this.cartItemService = cartItemService;
 		this.ratingService = ratingService;
 	}
-
 	@Override
 	public List<Book> findAll() {
 		return bookRepository.findAll();
@@ -39,11 +40,10 @@ public class BookServiceImpl implements BookService {
 	}
 	
 	@Override
-	public List<Book> findByAuthor(Long id) {
-		Author author = authorService.findById(id);
+	public List<Book> findByAuthor(Long authorId) {
+		Author author = authorService.findById(authorId);
 		return bookRepository.findAll().stream().filter(b -> b.getAuthor().equals(author)).toList();
 	}
-
 	@Override
 	public Book save(Book book) {
 		return bookRepository.save(book);
@@ -52,6 +52,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void deleteById(Long id) {
 		Book book = findById(id);
+		book.getRatings().clear();
 		for(CartItem cartItem : book.getCartItems()){
 			cartItem.setBook(null);
 			cartItemService.save(cartItem);
@@ -79,7 +80,18 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book update(Long bookId, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
+	public List<Book> findAllBooksByTitleContaining(String title) {
+		return this.bookRepository.findAllByTitleContaining(title);
+	}
+
+	@Override
+	public List<Book> findByGenre(Long genreId) {
+		Genre genre = genreService.findById(genreId);
+		return bookRepository.findAll().stream().filter(book -> book.getGenre().equals(genre)).toList();
+	}
+
+	@Override
+	public Book update(Long bookId, String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price, String imageURL) {
 		Author author;
 		if(authorId != null)
 			author = authorService.findById(authorId);
@@ -98,12 +110,13 @@ public class BookServiceImpl implements BookService {
 		book.setGenre(genre);
 		book.setDescription(description);
 		book.setPrice(price);
+		book.setImageURL(imageURL);
 		bookRepository.save(book);
 		return book;
 	}
 
 	@Override
-	public Book save(String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price) {
+	public Book save(String title, Long authorId, String firstName, String lastName, Long genreId, String description, double price, String imageURL) {
 		Author author;
 		if(authorId != null)
 			author = authorService.findById(authorId);
@@ -115,7 +128,7 @@ public class BookServiceImpl implements BookService {
 			}
 		}
 		Genre genre = genreService.findById(genreId);
-		Book book = new Book(title, author, genre, description, price);
+		Book book = new Book(title, author, genre, description, price, imageURL);
 		author.addBook(book);
 		bookRepository.save(book);
 		return book;

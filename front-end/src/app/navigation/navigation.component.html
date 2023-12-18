@@ -1,0 +1,16 @@
+<nav>
+    <input type="checkbox" id="check">
+    <label for="check" class="checkbtn">
+      <i class="fas fa-bars"></i>
+    </label>
+    <label class="logo">BookStore</label>
+    <ul *ngIf="tokenService.isLoggedIn()">
+      <li><a routerLinkActive="active" routerLink="/home">Home</a></li>
+      <li><a routerLink="/books" routerLinkActive="active" ariaCurrentWhenActive="page">Books</a></li>
+      <li><a routerLink="/orders" routerLinkActive="active">Orders</a></li>
+      <li><a routerLink="/recommended" routerLinkActive="active">Recommended</a></li>
+      <li *ngIf="tokenService.getRole() == 'ROLE_ADMIN'"><a routerLink="/admin" routerLinkActive="active">Admin</a></li>
+      <li><a class="icon" routerLink="/cart" routerLinkActive="active"><mat-icon>shopping_cart</mat-icon></a></li>
+      <li><a class="icon" (click)="logout()" style="cursor: pointer;"><mat-icon>logout</mat-icon></a></li>
+    </ul>
+  </nav>

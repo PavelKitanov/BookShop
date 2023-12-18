@@ -10,5 +10,5 @@ public interface RatingService {
     List<Rating> getAllRatings();
     Rating save(Rating rating);
     Rating findRatingByBookAndCustomerId(Book book, Long customerId);
-    void delete(Long ratingId);
+    void deleteById(Long ratingId);
 }

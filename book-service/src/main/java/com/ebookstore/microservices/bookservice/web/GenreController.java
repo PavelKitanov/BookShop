@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ebookstore.microservices.bookservice.models.Genre;
 import com.ebookstore.microservices.bookservice.services.GenreService;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/genres")
 public class GenreController {

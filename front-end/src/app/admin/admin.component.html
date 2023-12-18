@@ -1,0 +1,190 @@
+<body>
+
+    <div class="container mt-5">
+      <ul class="nav nav-tabs justify-content-center">
+        <li class="nav-item">
+          <a class="nav-link font"  id="books-tab" data-toggle="tab" href="#books" [ngClass]="{'active': activeTab === 'books'}">Books</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link font" id="authors-tab" data-toggle="tab" href="#authors" [ngClass]="{'active': activeTab === 'authors'}">Authors</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link font" id="genres-tab" data-toggle="tab" href="#genres" [ngClass]="{'active': activeTab === 'genres'}">Genres</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link font " id="orders-tab" data-toggle="tab" href="#orders" [ngClass]="{'active': activeTab === 'orders'}">Orders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link font" id="users-tab" data-toggle="tab" href="#users" [ngClass]="{'active': activeTab === 'users'}">Users</a>
+        </li>
+      </ul>
+    
+      <div class="tab-content mt-2">
+        <div class="tab-pane fade" id="books" [ngClass]="{'active show': activeTab === 'books'}">
+           <div class="container mt-5">
+             <h4><a routerLink="/addBook" class="custom-button">Add Book</a></h4>
+             <table class="table">
+               <thead>
+                 <tr>
+                   <th scope="col">Book ID</th>
+                   <th scope="col">Title</th>
+                   <th scope="col">Author</th>
+                   <th scope="col">Genre</th>
+                   <th scope="col">Price</th>
+                   <th scope="col"></th>
+                   <th scope="col"></th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr [class.table-primary]="i % 2 === 0" *ngFor="let book of books; let i = index">
+                     <th scope="row">{{ book.bookId }}</th>
+                     <td>{{ book.title }}</td>
+                     <td>{{ book.author.firstName + " " + book.author.lastName }}</td>
+                     <td>{{ book.genre.genre }}</td>
+                     <td>${{ book.price }}</td>
+                     <td>
+                       <a [routerLink]="['/editBook', book.bookId]" class="action-button">
+                         <mat-icon [ngStyle]="{'color':'#4e82b1'}">edit</mat-icon> 
+                       </a>
+                     </td>
+                     <td>
+                       <a class="action-button" (click)="deleteBook(book.bookId)" style="cursor: pointer;">
+                         <mat-icon [ngStyle]="{'color':'#4e82b1'}">delete</mat-icon> 
+                       </a>
+                     </td>
+                   </tr>
+               </tbody>
+             </table>
+           </div>
+        </div>
+        <div class="tab-pane fade" id="authors" [ngClass]="{'active show': activeTab === 'authors'}">
+          <div class="container mt-5">
+            <h4><a routerLink="/addAuthor" class="custom-button">Add Author</a></h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Author ID</th>
+                  <th scope="col">Firstname</th>
+                  <th scope="col">Lastname</th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr [class.table-primary]="i % 2 === 0" *ngFor="let author of authors; let i = index">
+                    <th scope="row">{{ author.authorId }}</th>
+                    <td>{{ author.firstName }}</td>
+                    <td>{{ author.lastName}}</td>
+                    <td>
+                      <a [routerLink]="['/editAuthor', author.authorId]" class="action-button">
+                        <mat-icon [ngStyle]="{'color':'#4e82b1'}">edit</mat-icon> 
+                      </a>
+                    </td>
+                    <td>
+                      <a class="action-button" (click)="deleteAuthor(author.authorId)" style="cursor: pointer;">
+                        <mat-icon [ngStyle]="{'color':'#4e82b1'}">delete</mat-icon> 
+                      </a>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="genres" [ngClass]="{'active show': activeTab === 'genres'}">
+          <div class="container mt-5">
+            <h4><a routerLink="/addGenre" class="custom-button">Add Genre</a></h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Genre ID</th>
+                  <th scope="col">Genre</th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr [class.table-primary]="i % 2 === 0" *ngFor="let genre of genres; let i = index">
+                    <th scope="row">{{ genre.genreId }}</th>
+                    <td>{{ genre.genre }}</td>
+                    <td>
+                      <a [routerLink]="['/editGenre', genre.genreId]" class="action-button">
+                        <mat-icon [ngStyle]="{'color':'#4e82b1'}">edit</mat-icon> 
+                      </a>
+                    </td>
+                    <td>
+                      <a class="action-button" (click)="deleteGenre(genre.genreId)" style="cursor: pointer;">
+                        <mat-icon [ngStyle]="{'color':'#4e82b1'}">delete</mat-icon> 
+                      </a>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="orders" [ngClass]="{'active show': activeTab === 'orders'}">
+          <div class="container mt-5">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Books Ordered</th>
+                  <th scope="col">Customer Username</th>
+                  <th scope="col">Customer Email</th>
+                  <th scope="col">Coupon Code</th>
+                  <th scope="col">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr [class.table-primary]="i % 2 === 0" *ngFor="let order of orders; let i = index">
+                    <th scope="row">{{ order.orderId }}</th>
+                    <td>
+                      <ul>
+                        <li *ngFor="let item of order.cart.cartItems">
+                          {{ item.book.title }} ({{item.book.author.firstName + " " + item.book.author.lastName }}) x {{ item.quantity }}
+                        </li>
+                      </ul>
+                    </td>
+                    <td>{{ getCustomerUsernameForOrder(order.customerId) }}</td>
+                    <td>{{ getCustomerEmailForOrder(order.customerId) }}</td>
+                    <td>{{ order.discount == null ? '/' : order.discount }}</td>
+                    <td>${{ order.orderTotalPrice }}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="users" [ngClass]="{'active show': activeTab === 'users'}">
+          <div class="container mt-5">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Username</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Facebook ID</th>
+                  <th scope="col">Google ID</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr [class.table-primary]="i % 2 === 0" *ngFor="let user of users; let i = index">
+                    <th scope="row">{{ user.userId }}</th>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role.name }}</td>
+                    <td>{{ user.facebookId == null ? '/' : user.facebookId }}</td>
+                    <td>{{ user.googleId == null ? '/' : user.googleId }}</td>
+                    <td>
+                      <a [routerLink]="['/editUser', user.userId]" class="action-button">
+                        <mat-icon [ngStyle]="{'color':'#4e82b1'}">edit</mat-icon> 
+                      </a>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>

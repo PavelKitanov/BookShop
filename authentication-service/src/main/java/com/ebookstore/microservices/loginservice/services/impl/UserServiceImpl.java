@@ -196,6 +196,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User updateRole(Long userId, String roleName) {
+        User user = userRepository.findById(userId).orElse(null);
+        Role role = roleService.findRoleByName(Roles.ROLE_USER.toString().equals(roleName) ? Roles.ROLE_USER : Roles.ROLE_ADMIN);
+
+        user.setRole(role);
+        userRepository.save(user);
+        return user;
+    }
+
+    @Override
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public Role getUserRole(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        assert user != null;
+        return user.getRole();
+    }
+
     private String extractTokenFromHeader(String tokenHeader) {
         if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
             return tokenHeader.substring(7);

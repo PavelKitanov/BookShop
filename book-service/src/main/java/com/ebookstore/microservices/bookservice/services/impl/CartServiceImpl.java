@@ -1,5 +1,6 @@
 package com.ebookstore.microservices.bookservice.services.impl;
 
+import com.ebookstore.microservices.bookservice.enumerations.Discount;
 import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Book;
 import com.ebookstore.microservices.bookservice.models.Cart;
@@ -8,9 +9,11 @@ import com.ebookstore.microservices.bookservice.repositories.CartRepository;
 import com.ebookstore.microservices.bookservice.services.BookService;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
 import com.ebookstore.microservices.bookservice.services.CartService;
+import com.ebookstore.microservices.bookservice.services.OrderService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -97,7 +100,11 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.getActiveCartByCustomerId(customerId)
                 .orElseThrow(() -> new CartNotFoundException("Cart for the customer with id " + customerId +" is not found."));
 
-        cart.getCartItems().forEach(cartItemService::delete);
+
+        cart.setCartTotalPrice(0);
+        List<CartItem> cartItems = cart.getCartItems();
+        for (CartItem item : cartItems)
+            cartItemService.deleteById(item.getCartItemId());
         cartRepository.save(cart);
         return cart;
     }
@@ -105,5 +112,31 @@ public class CartServiceImpl implements CartService {
     @Override
     public void deleteById(Long id) {
         cartRepository.deleteById(id);
+    }
+
+    @Override
+    public double couponCode(Long userId, String discount) {
+        Cart cart = getCartByCustomerId(userId);
+        double totalPrice = cart.getCartTotalPrice();
+        if(Objects.equals(discount, Discount.LOW.toString()))
+            return ((totalPrice / 100) * 10);
+        else if(Objects.equals(discount, Discount.MEDIUM.toString()))
+            return ((totalPrice / 100) * 30);
+        else if(Objects.equals(discount, Discount.HIGH.toString()))
+            return ((totalPrice / 100) * 50);
+        else
+            return 0;
+    }
+
+    @Override
+    public CartItem update(Long cartItemId, int quantity, Long customerId) {
+        CartItem cartItem = cartItemService.findById(cartItemId);
+        cartItem.setQuantity(quantity);
+
+        Cart cart = this.getCartByCustomerId(customerId);
+        cart.updateTotalPrice();
+        cartRepository.save(cart);
+
+        return cartItemService.update(cartItem);
     }
 }

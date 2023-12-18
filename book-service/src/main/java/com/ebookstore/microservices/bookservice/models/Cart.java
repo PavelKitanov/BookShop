@@ -20,8 +20,7 @@ public class Cart {
     private Long customerId;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "cart",fetch = FetchType.LAZY,
-    cascade =  CascadeType.ALL)
+    @OneToOne(mappedBy = "cart",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Order order;
 
     @OneToMany

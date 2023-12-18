@@ -1,0 +1,32 @@
+<div class="container">
+    <form [formGroup]="addAuthorForm" (submit)="addAuthor()">
+        <div class="example-container">
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="firstName">
+                <mat-icon matSuffix>Title</mat-icon>
+                <mat-error *ngIf="addAuthorForm.get('firstName')?.invalid">{{getFirstNameErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="lastName">
+                <mat-icon matSuffix>Title</mat-icon>
+                <mat-error *ngIf="addAuthorForm.get('lastName')?.invalid">{{getLastNameErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <div class="buttons">
+                <button type="submit" mat-button color="primary">
+                    <mat-icon>save</mat-icon> Save
+                </button>
+                <a type="button" mat-button color="primary" [routerLink]="['/admin', 'authors']">
+                    <mat-icon>cancel</mat-icon> Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

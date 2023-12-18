@@ -1,0 +1,24 @@
+<div class="container">
+    <form [formGroup]="addGenreForm" (submit)="addGenre()">
+        <div class="example-container">
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Genre Name</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="genre">
+                <mat-icon matSuffix>Title</mat-icon>
+                <mat-error *ngIf="addGenreForm.get('genre')?.invalid">{{getGenreErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <div class="buttons">
+                <button type="submit" mat-button color="primary">
+                    <mat-icon>save</mat-icon> Save
+                </button>
+                <a type="button" mat-button color="primary" [routerLink]="['/admin', 'genres']">
+                    <mat-icon>cancel</mat-icon> Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+

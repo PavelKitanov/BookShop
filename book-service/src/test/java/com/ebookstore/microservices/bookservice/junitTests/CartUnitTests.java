@@ -116,7 +116,7 @@ public class CartUnitTests {
         int quantity = 5;
 
         Cart cart = new Cart(customerId);
-        Book book = new Book("Book title", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99);
+        Book book = new Book("Book title", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99, "image");
         CartItem cartItem = new CartItem(book, quantity, customerId);
 
         when(cartRepository.getActiveCartByCustomerId(customerId)).thenReturn(Optional.of(cart));
@@ -139,8 +139,8 @@ public class CartUnitTests {
         int quantity = 5;
 
         Cart cart = new Cart(customerId);
-        Book book1 = new Book("Book1", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99);
-        Book book2 = new Book("Book2", new Author("Jane","Smith"), new Genre("Non-Fiction"), "another description", 8.99);
+        Book book1 = new Book("Book1", new Author("John","Doe"), new Genre("Fiction"), "description", 5.99, "image");
+        Book book2 = new Book("Book2", new Author("Jane","Smith"), new Genre("Non-Fiction"), "another description", 8.99, "image");
         CartItem cartItem1 = new CartItem(book1, quantity, customerId);
         CartItem cartItem2 = new CartItem(book2, quantity, customerId);
         cart.getCartItems().add(cartItem1);

@@ -9,7 +9,7 @@ import java.util.Map;
 public class StripeChargeDto {
 
     private String stripeToken;
-    private String username;
+    private String name;
     private Double amount;
     private Boolean success;
     private String message;

@@ -29,22 +29,25 @@ public class Book {
 	@JsonIgnore
 	private List<CartItem> cartItems;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Rating> ratings;
 	
 	private String description;
 	
 	private double price;
+
+	private String imageURL;
 	
 	public Book() {
 		
 	}
 	
-	public Book(String title, Author author, Genre genre, String description, double price) {
+	public Book(String title, Author author, Genre genre, String description, double price, String imageURL) {
 		this.title = title;
 		this.author = author;
 		this.genre = genre;
 		this.description = description;
 		this.price = price;
+		this.imageURL = imageURL;
 	}
 }

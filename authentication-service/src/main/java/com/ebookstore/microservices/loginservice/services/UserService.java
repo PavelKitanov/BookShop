@@ -1,6 +1,7 @@
 package com.ebookstore.microservices.loginservice.services;
 
 
+import com.ebookstore.microservices.loginservice.models.Role;
 import com.ebookstore.microservices.loginservice.models.User;
 import com.ebookstore.microservices.loginservice.payload.responses.JwtResponse;
 import jakarta.mail.MessagingException;
@@ -28,5 +29,11 @@ public interface UserService {
     boolean verify(String verificationCode);
 
     User validateToken(String tokenHeader);
+
+    User updateRole(Long userId, String role);
+
+    User findUserById(Long userId);
+
+    Role getUserRole(Long userId);
 
 }

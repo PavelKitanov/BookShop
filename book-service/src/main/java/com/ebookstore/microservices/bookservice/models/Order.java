@@ -5,6 +5,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -25,10 +29,15 @@ public class Order {
 
     private double orderTotalPrice;
 
+    private String orderDate;
+
     public Order(Long customerId,Cart cart, Discount discount){
         this.customerId = customerId;
         this.cart = cart;
         this.discount = discount;
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, yyyy");
+        this.orderDate = date.format(formatter);
     }
 
 }

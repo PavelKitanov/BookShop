@@ -19,8 +19,8 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .sorted(Comparator.comparingDouble(bookDto -> -calculateAverageRating(bookDto)))
                 .toList();
 
-        if(sortedList.size() >= 5)
-            return sortedList.subList(0,5);
+        if(sortedList.size() >= 7)
+            return sortedList.subList(0,7);
         else
             return sortedList;
     }
@@ -38,7 +38,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<BookDto> itemBasedRecommenderSystem(List<BookDto> customerBooks, List<BookDto> allBooks) {
         Set<BookDto> recommended = new HashSet<>();
         for(BookDto book : customerBooks){
-            List<BookDto> recommendedByTargetBook = itemBasedRecommenderSystemByTargetBook(book.getBookId(), 5, allBooks);
+            List<BookDto> recommendedByTargetBook = itemBasedRecommenderSystemByTargetBook(book.getBookId(), 7, allBooks);
             recommended.addAll(recommendedByTargetBook);
         }
 
@@ -47,7 +47,10 @@ public class RecommendationServiceImpl implements RecommendationService {
                 recommended.remove(book);
         }
 
-        return recommended.stream().sorted(Comparator.comparing(BookDto::getSimilarityScore).reversed()).toList().subList(0,5);
+        if(recommended.size() >= 7)
+            return recommended.stream().sorted(Comparator.comparing(BookDto::getSimilarityScore).reversed()).toList().subList(0,7);
+        else
+            return recommended.stream().sorted(Comparator.comparing(BookDto::getSimilarityScore).reversed()).toList();
     }
 
     private List<BookDto> itemBasedRecommenderSystemByTargetBook(Long targetBookId, int numRecommendations, List<BookDto> books) {

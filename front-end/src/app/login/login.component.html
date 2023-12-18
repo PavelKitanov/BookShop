@@ -1,0 +1,45 @@
+<body>
+    <section class="container forms">
+        <div class="form login">
+            <div class="form-content">
+                <header>Login</header>
+                <form [formGroup]="loginForm">
+                    <div class="field input-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Username</mat-label>
+                            <input matInput formControlName="username" class="input">
+                            <mat-error *ngIf="loginForm.get('username')?.invalid">{{getUsernameErrorMessage()}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <br>
+                    <div class="field input-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Password</mat-label>
+                            <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password" class="password">
+                            <mat-error *ngIf="loginForm.get('password')?.invalid">{{getPasswordErrorMessage()}}</mat-error>
+                            <i class='bx bx-hide eye-icon' (click)="togglePasswordVisibility()"></i>
+                        </mat-form-field>
+                    </div>
+                    <br>
+                    <div class="field button-field">
+                        <button type="submit" (click)="login()">Login</button>
+                    </div>
+                </form>
+                <div class="form-link">
+                    <span>Don't have an account? <a routerLink="/signup" class="link signup-link">Signup</a></span>
+                </div>
+            </div>
+            <div class="line"></div>
+            <div class="media-options" style="cursor: pointer;">
+                <a class="field facebook" (click)="signInWithFB()">
+                    <i class='bx bxl-facebook facebook-icon'></i>
+                    <span class="facebook-text">Login with Facebook</span>
+                </a>
+            </div>
+            <br>
+            <div class="media-options">
+                <asl-google-signin-button class="field google" type='standard' size='large' text="signin_with" width="370px"></asl-google-signin-button>
+            </div>
+        </div>
+    </section>
+</body>

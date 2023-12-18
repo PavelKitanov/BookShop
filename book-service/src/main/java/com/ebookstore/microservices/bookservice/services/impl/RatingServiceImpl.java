@@ -35,7 +35,7 @@ public class RatingServiceImpl implements RatingService {
         return ratingRepository.findRatingByBookAndCustomerId(book, customerId).orElse(null);
     }
     @Override
-    public void delete(Long ratingId) {
+    public void deleteById(Long ratingId) {
         ratingRepository.deleteById(ratingId);
     }
 }

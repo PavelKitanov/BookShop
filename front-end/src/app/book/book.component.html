@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="filter-container">
+        <div class="filter-group">
+          <label for="titleFilter" class="filter-label">Filter by Name:</label>
+          <input id="titleFilter" type="text" [(ngModel)]="filterByTitle" (ngModelChange)="filterBooks()" class="filter-input">
+        </div>
+        <div class="filter-group">
+          <label for="authorFilter" class="filter-label">Select Author:</label>
+          <select id="authorFilter" [(ngModel)]="selectedAuthorId" (ngModelChange)="filterBooks()" class="filter-select">
+            <option value="" selected>Show all</option>
+            <option *ngFor="let author of authors" [value]="author.authorId">{{ author.firstName + " " + author.lastName }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="genreFilter" class="filter-label">Select Genre:</label>
+          <select id="genreFilter" [(ngModel)]="selectedGenreId" (ngModelChange)="filterBooks()" class="filter-select">
+            <option value="" selected>Show all</option>
+            <option *ngFor="let genre of genres" [value]="genre.genreId">{{ genre.genre }}</option>
+          </select>
+        </div>
+      </div>
+    <app-list-books [bookList]="displayedBooks"></app-list-books>
+    <div class="pagination-container">
+        <div class="pagination">
+            <button *ngFor="let page of getPages()" (click)="onPageChange(page)" [class.active]="page === currentPage">
+                {{ page }}
+            </button>
+        </div>
+    </div>
+</div>

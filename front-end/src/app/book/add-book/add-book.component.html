@@ -1,0 +1,69 @@
+<div class="container">
+    <form [formGroup]="addImageForm" (submit)="addBook()">
+        <div class="example-container">
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Title</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="title">
+                <mat-icon matSuffix>title</mat-icon>
+                <mat-error *ngIf="addImageForm.get('title')?.invalid">{{getTitleErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Author</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="author">
+                <mat-icon matSuffix>person</mat-icon>
+                <mat-error *ngIf="addImageForm.get('author')?.invalid">{{getAuthorErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Genre</mat-label>
+                <mat-select formControlName="genre" placeholder="Select genre">
+                <mat-option *ngFor="let genre of genres" [value]="genre?.genreId">{{ genre?.genre }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="addImageForm.get('genre')?.invalid">{{getGenreErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Summary</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="description">
+                <mat-icon matSuffix>description</mat-icon>
+                <mat-error *ngIf="addImageForm.get('description')?.invalid">{{getDescriptionErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Price</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="price">
+                <mat-icon matSuffix>attach_money</mat-icon>
+                <mat-error *ngIf="addImageForm.get('price')?.invalid">{{getPriceErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <p>
+                <mat-form-field appearance="outline">
+                <mat-label>Image URL</mat-label>
+                <input matInput placeholder="Placeholder" formControlName="imageURL">
+                <mat-icon matSuffix>image</mat-icon>
+                <mat-error *ngIf="addImageForm.get('price')?.invalid">{{getImageErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </p>
+            <br>
+            <div class="buttons">
+                <button type="submit" mat-button color="primary">
+                    <mat-icon>save</mat-icon> Save
+                </button>
+                <a type="button" mat-button color="primary" [routerLink]="['/admin', 'books']">
+                    <mat-icon>cancel</mat-icon> Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

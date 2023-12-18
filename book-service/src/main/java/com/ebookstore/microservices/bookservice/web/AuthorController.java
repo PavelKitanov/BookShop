@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ebookstore.microservices.bookservice.models.Author;
 import com.ebookstore.microservices.bookservice.services.AuthorService;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/authors")
 public class AuthorController {
@@ -24,12 +25,15 @@ public class AuthorController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<Author>> getAll(){
+	public ResponseEntity<List<Author>> getAll(@RequestHeader("Authorization") String tokenHeader){
+		tokenService.callValidateToken(tokenHeader);
 		return ResponseEntity.ok(authorService.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Author> getAuthorById(@PathVariable Long id) {
+	public ResponseEntity<Author> getAuthorById(@RequestHeader("Authorization") String tokenHeader,
+												@PathVariable Long id) {
+		tokenService.callValidateToken(tokenHeader);
         Author author = authorService.findById(id);
         return ResponseEntity.ok(author);
     }

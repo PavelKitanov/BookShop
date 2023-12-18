@@ -1,0 +1,80 @@
+<div class="container">
+
+    <div class="flex-container" fxLayout.sm="column">
+        <div class="flex-item">
+            <img src="https://i.pinimg.com/originals/52/ec/12/52ec12f7dd324864949267c92cce2e43.jpg" class="image">
+        </div>
+        <div class="flex-item">
+            <form [formGroup]="updateImageForm" (submit)="updateImage(book?.bookId)">
+                <div class="example-container">
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Title</mat-label>
+                        <input matInput placeholder="Placeholder" value={{book?.title}} formControlName="title">
+                        <mat-icon matSuffix>title</mat-icon>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Author</mat-label>
+                        <input matInput placeholder="Placeholder" [value]="book?.author.firstName + ' ' + book?.author.lastName" formControlName="author">
+                        <mat-icon matSuffix>person</mat-icon>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Genre</mat-label>
+                        <mat-select formControlName="genre" placeholder="Select genre">
+                        <mat-option *ngFor="let genre of genres" [value]="genre?.genreId">{{ genre?.genre }}</mat-option>
+                        </mat-select>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Summary</mat-label>
+                        <input matInput placeholder="Placeholder" value={{book?.description}} formControlName="description" >
+                        <mat-icon matSuffix>description</mat-icon>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Price</mat-label>
+                        <input matInput placeholder="Placeholder" value={{book?.price}} formControlName="price" >
+                        <mat-icon matSuffix>attach_money</mat-icon>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p>
+                        <mat-form-field appearance="outline">
+                        <mat-label>Image URL</mat-label>
+                        <input matInput placeholder="Placeholder" value={{book?.imageURL}} formControlName="imageURL" >
+                        <mat-icon matSuffix>image</mat-icon>
+                        </mat-form-field>
+                    </p>
+                    <br>
+                    <p class="buttons">
+                        <span *ngIf="disabled">
+                            <button mat-button color="primary" (click)="edit()" style="color: #4e82b1;">
+                                <mat-icon style="color: #4e82b1;">edit</mat-icon> Edit Book
+                            </button>
+                        </span>
+                        <span *ngIf="!disabled">
+                            <button type="submit" mat-button color="primary" style="color: #4e82b1;">
+                                <mat-icon style="color: #4e82b1;">save</mat-icon> Save Book
+                            </button>
+                        </span>
+                        <span>
+                            <a type="button" mat-button color="primary" [routerLink]="['/admin', 'books']" style="color: #4e82b1;">
+                                <mat-icon style="color: #4e82b1;">cancel</mat-icon> Cancel
+                            </a>
+                        </span>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

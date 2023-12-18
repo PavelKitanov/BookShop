@@ -5,6 +5,8 @@ import com.ebookstore.microservices.loginservice.models.Role;
 import com.ebookstore.microservices.loginservice.repositories.RoleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RoleServiceImpl implements com.ebookstore.microservices.loginservice.services.RoleService {
 
@@ -22,5 +24,10 @@ public class RoleServiceImpl implements com.ebookstore.microservices.loginservic
     @Override
     public Role findRoleByName(Roles name) {
         return roleRepository.findRoleByName(name);
+    }
+
+    @Override
+    public List<Role> findAll() {
+        return roleRepository.findAll();
     }
 }

@@ -2,9 +2,11 @@ package com.ebookstore.microservices.bookservice.services.impl;
 
 import com.ebookstore.microservices.bookservice.exceptions.CartNotFoundException;
 import com.ebookstore.microservices.bookservice.models.Book;
+import com.ebookstore.microservices.bookservice.models.Cart;
 import com.ebookstore.microservices.bookservice.models.CartItem;
 import com.ebookstore.microservices.bookservice.repositories.CartItemRepository;
 import com.ebookstore.microservices.bookservice.services.CartItemService;
+import com.ebookstore.microservices.bookservice.services.CartService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,15 +43,20 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItem update(Long id, int quantity) {
-        CartItem cartItem = findById(id);
-        cartItem.setQuantity(quantity);
-        return cartItemRepository.save(cartItem);
+    public void deleteById(Long id) {
+        cartItemRepository.deleteById(id);
     }
 
     @Override
-    public void deleteById(Long id) {
-        cartItemRepository.deleteById(id);
+    public CartItem update(CartItem cartItem) {
+        Book book = cartItem.getBook();
+        Long customerId = cartItem.getCustomerId();
+        CartItem cartItemIsPresent = cartItemRepository.findCartItemByBookAndCustomerId(book, customerId);
+        if(cartItemIsPresent != null) {
+            cartItemIsPresent.setQuantity(cartItem.getQuantity());
+            return cartItemRepository.save(cartItemIsPresent);
+        }
+        return cartItemRepository.save(cartItem);
     }
 
     @Override
