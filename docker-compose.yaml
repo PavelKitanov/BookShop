@@ -110,6 +110,13 @@ services:
       - ebookstore-network
     restart: always
   
+  frontend:
+    image: bookstore-frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - ebookstore-network
+  
       
 networks:
   ebookstore-network:

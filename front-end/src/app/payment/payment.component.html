@@ -1,45 +1,43 @@
-<div class="container py-5">
-  <div class="row">
-      <div class="col-lg-6 mx-auto">
-          <div class="card ">
-              <div class="card-header">
-                  <div class="bg-white shadow-sm pt-4 pl-2 pr-2 pb-2">
-                      <!-- Credit card form tabs -->
-                      <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
-                          <li class="nav-item"> <i class="fas fa-credit-card mr-2"></i> Credit Card </li>
-                      </ul>
-                  </div> <!-- End -->
-                  <!-- Credit card form content -->
-                  <div class="tab-content">
-                      <!-- credit card info-->
-                      <div id="credit-card" class="tab-pane fade show active pt-3">
-                        <div class="payment-form">
-                          <ngx-stripe-card-group [formGroup]="stripe" [elementsOptions]="elementsOptions">
-                            <div class="form-row">
-                              <label for="name">Card Holder Name</label>
-                              <input id="name" formControlName="name" placeholder="Card Holder Name" class="no-border" />
-                              <mat-error *ngIf="stripe.get('name')?.invalid">{{getNameErrorMessage()}}</mat-error>
-                            </div>
-                            <div class="form-row">
-                              <label for="cardNumber">Card Number</label>
-                              <ngx-stripe-card-number [options]="cardOptions"></ngx-stripe-card-number>
-                            </div>
-                            <div class="form-row">
-                              <label for="expiry">Expiry Date</label>
-                              <ngx-stripe-card-expiry [options]="cardOptions"></ngx-stripe-card-expiry>
-                            </div>
-                            <div class="form-row">
-                              <label for="cvc">CVC</label>
-                              <ngx-stripe-card-cvc [options]="cardOptions"></ngx-stripe-card-cvc>
-                            </div>
-                          </ngx-stripe-card-group>
-                          <button type="submit" (click)="createToken()">Pay</button>
+<body>
+  <div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card ">
+                <div class="card-header">
+                    <div class="shadow-sm pt-4 pl-2 pr-2 pb-2">
+                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
+                            <li class="nav-item"> <i class="fas fa-credit-card mr-2"></i> Credit Card </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                          <div class="payment-form">
+                            <ngx-stripe-card-group [formGroup]="stripe" [elementsOptions]="elementsOptions">
+                              <div class="form-row">
+                                <label for="name">Card Holder Name</label>
+                                <input id="name" formControlName="name" placeholder="Card Holder Name" class="no-border" />
+                                <mat-error *ngIf="stripe.get('name')?.invalid">{{getNameErrorMessage()}}</mat-error>
+                              </div>
+                              <div class="form-row">
+                                <label for="cardNumber">Card Number</label>
+                                <ngx-stripe-card-number [options]="cardOptions"></ngx-stripe-card-number>
+                              </div>
+                              <div class="form-row">
+                                <label for="expiry">Expiry Date</label>
+                                <ngx-stripe-card-expiry [options]="cardOptions"></ngx-stripe-card-expiry>
+                              </div>
+                              <div class="form-row">
+                                <label for="cvc">CVC</label>
+                                <ngx-stripe-card-cvc [options]="cardOptions"></ngx-stripe-card-cvc>
+                              </div>
+                            </ngx-stripe-card-group>
+                            <button type="submit" (click)="createToken()">Pay</button>
+                          </div>
                         </div>
-                      </div>
-                  </div> <!-- End -->
-                  <!-- End -->
-              </div>
-          </div>
-      </div>
-  </div>
-</div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>  
+</body>

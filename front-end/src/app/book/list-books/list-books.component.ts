@@ -97,6 +97,7 @@ export class ListBooksComponent implements OnInit {
     else{
       this.bookService.rateBook(this.tokenService.getToken(), book.bookId, parseInt(newRating)).subscribe(data => {
         console.log(data);
+        this.getAverageRating(data.ratings);
       });
     }
 

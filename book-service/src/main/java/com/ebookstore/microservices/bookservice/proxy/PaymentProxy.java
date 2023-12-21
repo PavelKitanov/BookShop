@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 //@FeignClient(name="payment-service", url="http://localhost:8100")
-@FeignClient(name="payment-service") // eureka discovery server (load balancing)
+@FeignClient(name="payment-service")
 public interface PaymentProxy {
 
     @PostMapping("/payment/create-payment-intent")

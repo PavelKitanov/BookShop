@@ -15,7 +15,7 @@ export class CartComponent implements OnInit {
 
   cart: any;
   couponCode: string = '';
-  discount: number = 0;
+  discount: number = 0.00;
   counter: any;
 
   constructor(private cartService: CartService,
@@ -71,6 +71,7 @@ export class CartComponent implements OnInit {
       });
     } else {
       const amount = this.cart?.cartTotalPrice - this.discount;
+      console.log(amount);
       this.router.navigateByUrl(`/payment/${amount}/${this.couponCode}`);
     }
   }

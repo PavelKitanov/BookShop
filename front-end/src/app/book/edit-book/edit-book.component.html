@@ -2,7 +2,7 @@
 
     <div class="flex-container" fxLayout.sm="column">
         <div class="flex-item">
-            <img src="https://i.pinimg.com/originals/52/ec/12/52ec12f7dd324864949267c92cce2e43.jpg" class="image">
+            <img [src]="book?.imageURL" class="image">
         </div>
         <div class="flex-item">
             <form [formGroup]="updateImageForm" (submit)="updateImage(book?.bookId)">

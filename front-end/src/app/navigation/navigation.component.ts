@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TokenService } from '../services/token-service/token.service';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-navigation',
@@ -11,11 +12,16 @@ export class NavigationComponent {
 
   tab = 'books';
 
-  constructor(public tokenService: TokenService, 
+  constructor(public tokenService: TokenService,
+              private socialAuthService: SocialAuthService,
               private router: Router){}
 
-  logout(): void {
+  async logout(): Promise<void> {
+    this.socialAuthService.authState.subscribe(async (user) => {
+      if(user != null)
+      await this.socialAuthService.signOut();
+    });
     this.tokenService.clearStorage();
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/login');
   }
 }

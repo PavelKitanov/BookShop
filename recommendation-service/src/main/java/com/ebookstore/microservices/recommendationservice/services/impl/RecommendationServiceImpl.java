@@ -64,7 +64,6 @@ public class RecommendationServiceImpl implements RecommendationService {
             throw new IllegalArgumentException("Target book not found.");
         }
 
-        // Calculate cosine similarity between the target book and all other books
         RealVector targetVector = bookVectors.get(targetBookId);
         CosineDistance cosineDistance = new CosineDistance();
         Map<Long, Double> similarities = new HashMap<>();
@@ -76,7 +75,6 @@ public class RecommendationServiceImpl implements RecommendationService {
             }
         }
 
-        // Sort books by similarity in descending order
         List<BookDto> recommendedBooks = similarities.entrySet().stream()
                 .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
                 .limit(numRecommendations)
@@ -95,7 +93,6 @@ public class RecommendationServiceImpl implements RecommendationService {
 
 
     private RealVector createVector(String author, String genre) {
-        // Create a vector representation for a book based on author and genre
         double[] vectorData = new double[2];
         vectorData[0] = author.hashCode();
         vectorData[1] = genre.hashCode();

@@ -58,7 +58,7 @@ export class PaymentComponent implements OnInit {
     this.stripe = this.fb.group({
       'name': new FormControl('',[Validators.required]),
     });
-    this.amount = parseInt(this.route.snapshot.paramMap.get('amount'));
+    this.amount = parseFloat(this.route.snapshot.paramMap.get('amount'));
     this.couponCode = this.route.snapshot.paramMap.get('couponCode');
   }
 
@@ -72,7 +72,8 @@ export class PaymentComponent implements OnInit {
       .createToken(this.card.element, { name })
       .subscribe((result) => {
         if (result.token) {
-          this.orderService.createOrder(this.tokenService.getToken(), result.token.id, name, this.amount, this.couponCode? this.couponCode : '').subscribe(data => {
+          console.log(parseFloat(this.amount.toFixed(2)));
+          this.orderService.createOrder(this.tokenService.getToken(), result.token.id, name, parseFloat(this.amount.toFixed(2)), this.couponCode? this.couponCode : '').subscribe(data => {
             console.log(data);
             this.openSnackBar("Payment completed","");
             this.router.navigateByUrl("/orders");
